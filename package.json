@@ -19,7 +19,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://git3.nexdev.net/sc-packages/sc-slot-game-base.git"
+        "url": "https://git3.nexdev.net/sc-packages/sc-slot-board-generator.git"
     },
     "keywords": [
         "board-generator",
