@@ -25,13 +25,29 @@ export default class BoardGenerator {
                 reelSymbols.push(this.randomSymbol());
             }
 
-            board.push(this.shuffle(reelSymbols));
+            board.push(this.shuffleReel(reelSymbols));
         }
 
         return board;
     }
 
-    shuffle(reel) {
+    randomSymbol() {
+        return this.chance.integer({ min: 0, max: this.definition.numberOfSymbols - this.definition.specialSymbols.length - 1 });
+    }
+
+    explodeAndRefill(board, winSymbols = []) {
+        const newBoard = [];
+
+        for (let i = 0; i < board.length; i++) {
+            const reel = this.explodeReel(board[i], winSymbols);
+            const collapse = this.collapseReel(reel);
+            newBoard.push(this.refillReel(collapse));
+        }
+
+        return newBoard;
+    }
+
+    shuffleReel(reel) {
         let shuffledReel = reel;
 
         for (let index = 0; index < this.definition.numberOfShuffles; index++) {
@@ -41,11 +57,7 @@ export default class BoardGenerator {
         return shuffledReel;
     }
 
-    randomSymbol() {
-        return this.chance.integer({ min: 0, max: this.definition.numberOfSymbols - this.definition.specialSymbols.length - 1 });
-    }
-
-    explode(reel, winSymbols = []) {
+    explodeReel(reel, winSymbols = []) {
         winSymbols.forEach((winSymbol) => {
             reel = reel.map((symbol) => (symbol === winSymbol ? this.NoSymbol : symbol));
         });
@@ -53,7 +65,7 @@ export default class BoardGenerator {
         return reel;
     }
 
-    collapse(reel) {
+    collapseReel(reel) {
         const symbols = reel.filter((sym) => sym !== this.NoSymbol);
         const totalCollapsedItems = reel.length - symbols.length;
 
@@ -70,7 +82,7 @@ export default class BoardGenerator {
         return newReel;
     }
 
-    refill(reel) {
+    refillReel(reel) {
         return reel.map((symbol) => (symbol === this.NoSymbol ? this.randomSymbol() : symbol));
     }
 }

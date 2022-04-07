@@ -31,13 +31,13 @@ describe("BoardGenerator", () => {
         });
     });
 
-    describe("explode", () => {
+    describe("explodeReel", () => {
         it("return the same reel if no win symbols", () => {
             // Arrange
             const board = boardGenerator.generate();
 
             // Act
-            const result = boardGenerator.explode(board[0], []);
+            const result = boardGenerator.explodeReel(board[0], []);
 
             // Assert
             expect(result).toStrictEqual(board[0]);
@@ -49,21 +49,21 @@ describe("BoardGenerator", () => {
             const winSymbols = [2];
 
             // Act
-            const result = boardGenerator.explode(reel, winSymbols);
+            const result = boardGenerator.explodeReel(reel, winSymbols);
 
             // Assert
             expect(result.filter((symbol) => symbol === boardGenerator.NoSymbol).length).toBe(2);
         });
     });
 
-    describe("collapse", () => {
+    describe("collapseReel", () => {
         describe("when there is no symbols to collapse", () => {
             it("return the same reel", () => {
                 // Arrange
                 const reel = [8, 8, 8, 2, 2];
 
                 // Act
-                const result = boardGenerator.collapse(reel);
+                const result = boardGenerator.collapseReel(reel);
 
                 // Assert
                 expect(result).toStrictEqual(reel);
@@ -77,7 +77,7 @@ describe("BoardGenerator", () => {
                 const expected = [boardGenerator.NoSymbol, boardGenerator.NoSymbol, 8, 8, 8];
 
                 // Act
-                const result = boardGenerator.collapse(reel);
+                const result = boardGenerator.collapseReel(reel);
 
                 // Assert
                 expect(result).toStrictEqual(expected);
@@ -85,16 +85,53 @@ describe("BoardGenerator", () => {
         });
     });
 
-    describe("refill", () => {
+    describe("refillReel", () => {
         it("return new reel without NoSymbol", () => {
             // Arrange
             const reel = [boardGenerator.NoSymbol, boardGenerator.NoSymbol, 8, 8, 8];
 
             // Act
-            const result = boardGenerator.refill(reel);
+            const result = boardGenerator.refillReel(reel);
 
             // Assert
             expect(result.every((symbol) => symbol !== boardGenerator.NoSymbol)).toBeTrue();
+        });
+    });
+
+    describe("explodeAndRefill", () => {
+        it("return new board with the same total of reels", () => {
+            // Arrange
+            const board = boardGenerator.generate();
+
+            // Act
+            const result = boardGenerator.explodeAndRefill(board, [2]);
+
+            // Assert
+            expect(result.length).toEqual(board.length);
+        });
+
+        it("return new board with the same total of symbols", () => {
+            // Arrange
+            const board = boardGenerator.generate();
+            const totalSymbols = board.reduce((total, reel) => total + reel.length, 0);
+
+            // Act
+            const result = boardGenerator.explodeAndRefill(board, [2]);
+
+            // Assert
+            const actualTotalSymbols = result.reduce((total, reel) => total + reel.length, 0);
+            expect(totalSymbols).toEqual(actualTotalSymbols);
+        });
+
+        it("return new board without NoSymbol", () => {
+            // Arrange
+            const board = boardGenerator.generate();
+
+            // Act
+            const result = boardGenerator.explodeAndRefill(board, [2]);
+
+            // Assert
+            expect(result.every((reel) => reel.indexOf(boardGenerator.NoSymbol) === -1)).toBeTrue();
         });
     });
 });
