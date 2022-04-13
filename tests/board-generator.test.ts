@@ -1,7 +1,7 @@
 import BoardGenerator from "../src/board-generator";
 import defaultDefinition from "../src/default-definition";
 describe("BoardGenerator", () => {
-    let boardGenerator;
+    let boardGenerator: BoardGenerator;
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -10,7 +10,7 @@ describe("BoardGenerator", () => {
     });
 
     describe("generate", () => {
-        it("always return total items = reels", () => {
+        it("return total items = reels", () => {
             // Arrange
 
             // Act
@@ -20,14 +20,14 @@ describe("BoardGenerator", () => {
             expect(board.length).toEqual(defaultDefinition.reels);
         });
 
-        it("always return number symbol on reel as defined", () => {
+        it("return number symbol on reel as defined", () => {
             // Arrange
 
             // Act
             const board = boardGenerator.generate();
 
             // Assert
-            expect(board.every((reel) => reel.length === defaultDefinition.symbolsOnReel)).toBeTrue();
+            expect(board.every((reel) => reel.length === defaultDefinition.symbolsOnReel)).toBe(true);
         });
     });
 
@@ -53,6 +53,18 @@ describe("BoardGenerator", () => {
 
             // Assert
             expect(result.filter((symbol) => symbol === boardGenerator.NoSymbol).length).toBe(2);
+        });
+
+        it("return the reel without win symbols inside", () => {
+            // Arrange
+            const winSymbol = 2;
+            const reel = [8, 8, 8, 2, 2];
+
+            // Act
+            const result = boardGenerator.explodeReel(reel, [winSymbol]);
+
+            // Assert
+            expect(result.every((symbol) => symbol === winSymbol)).toBe(false);
         });
     });
 
@@ -94,7 +106,7 @@ describe("BoardGenerator", () => {
             const result = boardGenerator.refillReel(reel);
 
             // Assert
-            expect(result.every((symbol) => symbol !== boardGenerator.NoSymbol)).toBeTrue();
+            expect(result.every((symbol) => symbol !== boardGenerator.NoSymbol)).toBe(true);
         });
     });
 
@@ -131,7 +143,7 @@ describe("BoardGenerator", () => {
             const result = boardGenerator.explodeAndRefill(board, [2]);
 
             // Assert
-            expect(result.every((reel) => reel.indexOf(boardGenerator.NoSymbol) === -1)).toBeTrue();
+            expect(result.every((reel) => reel.indexOf(boardGenerator.NoSymbol) === -1)).toBe(true);
         });
     });
 });
