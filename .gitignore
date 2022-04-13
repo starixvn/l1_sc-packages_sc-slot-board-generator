@@ -5,3 +5,6 @@
 
 **/coverage
 **/reports
+
+lib/
+.vscode
