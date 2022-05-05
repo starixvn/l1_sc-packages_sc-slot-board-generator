@@ -2,90 +2,94 @@ import { Chance } from "chance";
 
 import * as defaultDefinition from "./default-definition";
 import { Difficulty } from "./difficulties";
+import MultiplierGenerator from "./multiplier-generator";
+import Reel from "./reel";
+
+interface IBoard {
+    newBoard: number[];
+    explodedSymbols?: number[];
+    newSymbols?: number[];
+    multipliers: number[];
+}
 
 export default class BoardGenerator {
     public readonly NoSymbol: number = -1;
     private difficulty: Difficulty;
     private readonly definition: any;
     private readonly chance: Chance.Chance;
+    private readonly multiplierGenerator: MultiplierGenerator;
 
     constructor(boardDefinition: any) {
         this.definition = boardDefinition ?? defaultDefinition;
         this.difficulty = Difficulty.Medium;
         this.chance = new Chance();
+
+        this.multiplierGenerator = new MultiplierGenerator(
+            this.definition.multiplier.symbol,
+            this.definition.multiplier.min,
+            this.definition.multiplier.max
+        );
     }
 
-    updateDifficulty(difficulty: Difficulty): void {
+    setDifficulty(difficulty: Difficulty): void {
         this.difficulty = difficulty;
     }
 
-    generate(): number[][] {
-        const board = [];
-
-        for (let reel = 0; reel < this.definition.reels; reel++) {
-            const reelSymbols = [];
-            for (let index = 0; index < this.definition.symbolsOnReel; index++) {
-                reelSymbols.push(this.randomSymbol());
-            }
-
-            board.push(this.shuffleReel(reelSymbols));
-        }
-
-        return board;
+    getDifficulty(): Difficulty {
+        return this.difficulty;
     }
 
-    explodeAndRefill(board: number[][], winSymbols: number[]): number[][] {
-        const newBoard = [];
+    generate(): IBoard {
+        const board = [];
 
-        for (const reel of board) {
-            const explodedReel = this.explodeReel(reel, winSymbols);
-            const collapse = this.collapseReel(explodedReel);
-            newBoard.push(this.refillReel(collapse));
+        for (let index = 0; index < this.definition.reels; index++) {
+            const reel = new Reel(this.definition.symbolsOnReel);
+            reel.shuffle();
+
+            board.push(...reel.get());
+        }
+
+        return {
+            newBoard: board,
+            multipliers: this.multiplierGenerator.generate(board),
+        };
+    }
+
+    explodeAndRefill(board: number[], winSymbols: number[]): IBoard {
+        const newBoard = [];
+        const exploded = [];
+        const filled = [];
+        const formattedBoard = this.formatBoard(board, this.definition.symbolsOnReel);
+
+        for (const reel of formattedBoard) {
+            const reelOfSymbols = new Reel(this.definition.symbolsOnReel, reel).explode(winSymbols).collapse().refill();
+
+            newBoard.push(...reelOfSymbols.get());
+            exploded.push(...reelOfSymbols.getExplodedItems());
+            filled.push(...reelOfSymbols.getFilledItems());
+        }
+
+        return {
+            newBoard: newBoard,
+            explodedSymbols: exploded,
+            newSymbols: filled,
+            multipliers: this.multiplierGenerator.generate(newBoard),
+        };
+    }
+
+    formatBoard(board: number[], symbolsOnReel: number): number[][] {
+        const newBoard = [];
+        const totalReels = board.length / symbolsOnReel;
+
+        for (let i = 0; i < totalReels; i++) {
+            const reel = [];
+            for (let j = 0; j < symbolsOnReel; j++) {
+                reel.push(board[i * symbolsOnReel + j]);
+            }
+
+            newBoard.push(reel);
         }
 
         return newBoard;
-    }
-
-    randomSymbol() {
-        return this.chance.integer({ min: 0, max: this.definition.numberOfSymbols - this.definition.specialSymbols.length - 1 });
-    }
-
-    shuffleReel(reel: number[]): number[] {
-        let shuffledReel = reel;
-
-        for (let index = 0; index < this.definition.numberOfShuffles; index++) {
-            shuffledReel = this.chance.shuffle(shuffledReel);
-        }
-
-        return shuffledReel;
-    }
-
-    explodeReel(reel: number[], winSymbols: number[] = []): number[] {
-        winSymbols.forEach((winSymbol) => {
-            reel = reel.map((symbol) => (symbol === winSymbol ? this.NoSymbol : symbol));
-        });
-
-        return reel;
-    }
-
-    collapseReel(reel: number[]): number[] {
-        const symbols = reel.filter((sym) => sym !== this.NoSymbol);
-        const totalCollapsedItems = reel.length - symbols.length;
-
-        if (totalCollapsedItems === 0) {
-            return reel;
-        }
-
-        const newReel = [];
-        for (let index = 0; index < reel.length; index++) {
-            const symbol = index < totalCollapsedItems ? this.NoSymbol : symbols[index - totalCollapsedItems];
-            newReel.push(symbol);
-        }
-
-        return newReel;
-    }
-
-    refillReel(reel: number[]): number[] {
-        return reel.map((symbol) => (symbol === this.NoSymbol ? this.randomSymbol() : symbol));
     }
 }
