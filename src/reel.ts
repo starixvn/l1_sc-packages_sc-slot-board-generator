@@ -1,5 +1,6 @@
 import { Chance } from "chance";
 import { default as defaultDefinition } from "./default-definition";
+import { Difficulty } from "./difficulties";
 import SymbolGenerator from "./symbols-generator";
 
 interface SymbolOccurences {
@@ -21,13 +22,15 @@ export default class Reel {
 
     private readonly symbolsGenerator: SymbolGenerator;
 
-    constructor(size: number, symbols?: number[], boardDefinition?: any) {
+    constructor(size: number, symbols?: number[], boardDefinition?: any, difficulty?: Difficulty) {
         this.size = size;
         this.chance = new Chance();
         this.definition = boardDefinition ?? { ...defaultDefinition };
 
-        this.symbolsGenerator = new SymbolGenerator(this.definition.normalSymbols, this.definition.freeSpins, this.definition.multiplier);
-        this.symbolsGenerator.load();
+        this.symbolsGenerator = new SymbolGenerator(
+            this.definition.numberOfSymbolsByDifficulty[difficulty || Difficulty.Medium],
+            this.definition.numberOfShuffles
+        );
 
         this.symbols = symbols ?? this.generate(size);
     }

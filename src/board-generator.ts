@@ -1,9 +1,11 @@
-import { Chance } from "chance";
+import { complement, concat, count, equals, flatten, head, includes, map, pipe, reject, repeat, splitAt, splitEvery, __ } from "ramda";
 
-import * as defaultDefinition from "./default-definition";
+import defaultDefinition from "./default-definition";
 import { Difficulty } from "./difficulties";
 import MultiplierGenerator from "./multiplier-generator";
 import Reel from "./reel";
+import SymbolsGenerator from "./symbols-generator";
+import { replace, replaceEach } from "./utils";
 
 interface IBoard {
     newBoard: number[];
@@ -16,13 +18,11 @@ export default class BoardGenerator {
     public readonly NoSymbol: number = -1;
     private difficulty: Difficulty;
     private readonly definition: any;
-    private readonly chance: Chance.Chance;
     private readonly multiplierGenerator: MultiplierGenerator;
 
-    constructor(boardDefinition: any) {
+    constructor(boardDefinition: any = null) {
         this.definition = boardDefinition ?? defaultDefinition;
         this.difficulty = Difficulty.Medium;
-        this.chance = new Chance();
 
         this.multiplierGenerator = new MultiplierGenerator(
             this.definition.multiplier.symbol,
@@ -40,14 +40,8 @@ export default class BoardGenerator {
     }
 
     generate(): IBoard {
-        const board = [];
-
-        for (let index = 0; index < this.definition.reels; index++) {
-            const reel = new Reel(this.definition.symbolsOnReel);
-            reel.shuffle();
-
-            board.push(...reel.get());
-        }
+        const generator = this.getSymbolGenerator();
+        const board = generator.randomSymbols(this.definition.reels * this.definition.symbolsOnReel);
 
         return {
             newBoard: board,
@@ -56,40 +50,47 @@ export default class BoardGenerator {
     }
 
     explodeAndRefill(board: number[], winSymbols: number[]): IBoard {
-        const newBoard = [];
-        const exploded = [];
-        const filled = [];
-        const formattedBoard = this.formatBoard(board, this.definition.symbolsOnReel);
+        const isWinningSymbol = includes(__, winSymbols);
+        const isNoSymbol = equals(Reel.NoSymbol);
+        const specialSymbol = -2;
+        const isSpecialSymbol = equals(specialSymbol);
 
-        for (const reel of formattedBoard) {
-            const reelOfSymbols = new Reel(this.definition.symbolsOnReel, reel).explode(winSymbols).collapse().refill();
+        const numberOfSymbols = count(isWinningSymbol, board);
+        const newSymbols = this.getSymbolGenerator().randomSymbols(numberOfSymbols);
 
-            newBoard.push(...reelOfSymbols.get());
-            exploded.push(...reelOfSymbols.getExplodedItems());
-            filled.push(...reelOfSymbols.getFilledItems());
-        }
+        const exploded = replace(complement(isWinningSymbol), Reel.NoSymbol, board);
+        const remained = replace(isWinningSymbol, Reel.NoSymbol, board);
+        const collapsed = this.collapse(remained);
+        const filled = pipe(
+            replace(complement(isNoSymbol), specialSymbol),
+            replaceEach(isNoSymbol, newSymbols),
+            replace(isSpecialSymbol, Reel.NoSymbol)
+        )(collapsed);
+
+        const newBoard = replaceEach(isNoSymbol, newSymbols, collapsed);
 
         return {
             newBoard: newBoard,
             explodedSymbols: exploded,
-            newSymbols: filled,
+            newSymbols: filled as any as number[],
             multipliers: this.multiplierGenerator.generate(newBoard),
         };
     }
 
-    formatBoard(board: number[], symbolsOnReel: number): number[][] {
-        const newBoard = [];
-        const totalReels = board.length / symbolsOnReel;
+    getSymbolGenerator(): SymbolsGenerator {
+        return new SymbolsGenerator(this.definition.numberOfSymbolsByDifficulty[this.difficulty], this.definition.numberOfShuffles);
+    }
 
-        for (let i = 0; i < totalReels; i++) {
-            const reel = [];
-            for (let j = 0; j < symbolsOnReel; j++) {
-                reel.push(board[i * symbolsOnReel + j]);
-            }
+    collapse(board: number[]): number[] {
+        const symbolsOnReel = this.definition.symbolsOnReel;
+        const emptyReel = repeat(Reel.NoSymbol, symbolsOnReel);
 
-            newBoard.push(reel);
-        }
+        const getReels = splitEvery(symbolsOnReel);
+        const removeNoSymbolInList = reject(equals(Reel.NoSymbol)) as (a: any[]) => any;
+        const appendNoSymbolToList = concat(__, emptyReel) as (a: any[]) => any;
+        const collapseReel = pipe(removeNoSymbolInList, appendNoSymbolToList, splitAt(symbolsOnReel), head);
+        const collapseBoard = pipe(getReels, map(collapseReel), flatten) as <T>(a: T[]) => T[];
 
-        return newBoard;
+        return collapseBoard(board);
     }
 }

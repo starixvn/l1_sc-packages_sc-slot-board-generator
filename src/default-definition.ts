@@ -1,3 +1,5 @@
+import { Difficulty } from "./difficulties";
+
 export default {
     reels: 5,
     symbolsOnReel: 6,
@@ -91,4 +93,22 @@ export default {
         max: 200,
     },
     numberOfShuffles: 3,
+    numberOfSymbolsByDifficulty: {
+        [Difficulty.Easy]: {},
+        [Difficulty.Medium]: {
+            0: 30,
+            1: 30,
+            2: 30,
+            3: 30,
+            4: 30,
+            5: 30,
+            6: 30,
+            7: 30,
+            8: 30,
+            9: 6,
+            10: 5,
+        },
+        [Difficulty.Hard]: {},
+        [Difficulty.Trial]: {},
+    },
 };

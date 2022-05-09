@@ -1,47 +1,50 @@
 import SymbolsGenerator from "../src/symbols-generator";
-import defaultDefinition from "../src/default-definition";
 
 describe("Symbols", () => {
+    const numberOfSymbols = {
+        0: 1,
+        1: 2,
+        2: 3,
+        3: 4,
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    describe("load", () => {
+    describe("constructor", () => {
         it("return total symbols as defined", () => {
-            // Arrange
-            const symbols = new SymbolsGenerator(defaultDefinition.normalSymbols, defaultDefinition.freeSpins, defaultDefinition.multiplier);
-
             // Act
-            symbols.load();
+            const symbols = new SymbolsGenerator(numberOfSymbols);
 
             // Assert
-            expect(symbols.getBoard().length).toEqual(SymbolsGenerator.DefaultNormalSymbols);
-        });
-    });
-
-    describe("getReel", () => {
-        it("return total symbols as defined TotalItemPerReel", () => {
-            // Arrange
-            const symbols = new SymbolsGenerator(defaultDefinition.normalSymbols, defaultDefinition.freeSpins, defaultDefinition.multiplier);
-
-            // Act
-            symbols.load();
-
-            // Assert
-            expect(symbols.getReel(0).length).toEqual(SymbolsGenerator.TotalItemPerReel);
+            expect(symbols.getBoard().length).toEqual(10);
         });
     });
 
     describe("getSymbol", () => {
         it("return one symbol", () => {
             // Arrange
-            const symbols = new SymbolsGenerator(defaultDefinition.normalSymbols, defaultDefinition.freeSpins, defaultDefinition.multiplier);
+            const symbols = new SymbolsGenerator(numberOfSymbols);
 
             // Act
-            symbols.load();
+            const randomSymbol = symbols.randomSymbol();
 
             // Assert
-            expect(symbols.randomSymbol()).toBeGreaterThan(-1);
+            expect(randomSymbol).toBeGreaterThan(-1);
+        });
+    });
+
+    describe("getSymbols", () => {
+        it("return set of symbols", () => {
+            // Arrange
+            const symbols = new SymbolsGenerator(numberOfSymbols);
+
+            // Act
+            const randomSymbols = symbols.randomSymbols(3);
+
+            // Assert
+            expect(randomSymbols).toHaveLength(3);
         });
     });
 });
