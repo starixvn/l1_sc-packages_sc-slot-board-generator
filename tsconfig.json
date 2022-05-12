@@ -3,14 +3,14 @@
         "rootDir": "./src",
         "outDir": "./lib",
         "lib": ["es5", "es6"],
-        "target": "es5",
-        "module": "commonjs",
+        "target": "ESNext",
+        "module": "ESNext",
         "sourceMap": true,
         "declaration": true,
         "declarationMap": true,
         "resolveJsonModule": true,
-        "strict": true,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "allowJs": true
     },
     "exclude": ["tests/", "lib/", "node_modules/"],
     "watchOptions": {

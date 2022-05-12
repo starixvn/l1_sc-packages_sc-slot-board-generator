@@ -1,4 +1,4 @@
-import { complement, concat, count, equals, flatten, head, includes, map, pipe, reject, repeat, splitAt, splitEvery, __ } from "ramda";
+import { both, complement, concat, count, equals, flatten, head, includes, map, pipe, reject, repeat, splitAt, splitEvery, __ } from "ramda";
 
 import defaultDefinition from "./default-definition";
 import { Difficulty } from "./difficulties";
@@ -7,7 +7,7 @@ import Reel from "./reel";
 import SymbolsGenerator from "./symbols-generator";
 import { replace, replaceEach } from "./utils";
 
-interface IBoard {
+export interface IBoard {
     newBoard: number[];
     explodedSymbols?: number[];
     newSymbols?: number[];
@@ -49,7 +49,7 @@ export default class BoardGenerator {
         };
     }
 
-    explodeAndRefill(board: number[], winSymbols: number[]): IBoard {
+    explodeAndRefill(board: number[], winSymbols: number[], oldMultipliers: number[]): IBoard {
         const isWinningSymbol = includes(__, winSymbols);
         const isNoSymbol = equals(Reel.NoSymbol);
         const specialSymbol = -2;
@@ -67,13 +67,21 @@ export default class BoardGenerator {
             replace(isSpecialSymbol, Reel.NoSymbol)
         )(collapsed);
 
+        const oldMultiplierValueBoard = this.convertToMultiplierValueBoard(collapsed, oldMultipliers);
+
+        const newMultipliers = this.multiplierGenerator.generate(newSymbols);
+        const newMultiplierValueBoard = this.convertToMultiplierValueBoard(newSymbols, newMultipliers);
+
+        const mergedMultiplierValueBoard = replaceEach(isNoSymbol, newMultiplierValueBoard, oldMultiplierValueBoard);
+        const multipliers = reject(isSpecialSymbol, mergedMultiplierValueBoard);
+
         const newBoard = replaceEach(isNoSymbol, newSymbols, collapsed);
 
         return {
             newBoard: newBoard,
             explodedSymbols: exploded,
             newSymbols: filled as any as number[],
-            multipliers: this.multiplierGenerator.generate(newBoard),
+            multipliers: multipliers as number[],
         };
     }
 
@@ -92,5 +100,17 @@ export default class BoardGenerator {
         const collapseBoard = pipe(getReels, map(collapseReel), flatten) as <T>(a: T[]) => T[];
 
         return collapseBoard(board);
+    }
+
+    convertToMultiplierValueBoard(board: number[], multiplierValues: number[]): number[] {
+        const isMultiplierSymbol = equals(defaultDefinition.multiplier.symbol);
+        const isNoSymbol = equals(Reel.NoSymbol);
+
+        const specialSymbol = -2;
+
+        return pipe(
+            replace(both(complement(isMultiplierSymbol), complement(isNoSymbol)), specialSymbol),
+            replaceEach(isMultiplierSymbol, multiplierValues)
+        )(board) as any as number[];
     }
 }

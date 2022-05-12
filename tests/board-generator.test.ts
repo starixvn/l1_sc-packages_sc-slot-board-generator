@@ -66,7 +66,7 @@ describe("BoardGenerator", () => {
             const board = boardGenerator.generate();
 
             // Act
-            const result = boardGenerator.explodeAndRefill(board.newBoard, [2]);
+            const result = boardGenerator.explodeAndRefill(board.newBoard, [2], []);
 
             // Assert
             expect(result.newBoard.length).toEqual(defaultDefinition.reels * defaultDefinition.symbolsOnReel);
@@ -77,7 +77,7 @@ describe("BoardGenerator", () => {
             const board = boardGenerator.generate();
 
             // Act
-            const result = boardGenerator.explodeAndRefill(board.newBoard, [2]);
+            const result = boardGenerator.explodeAndRefill(board.newBoard, [2], []);
 
             // Assert
             expect(result.newBoard.indexOf(boardGenerator.NoSymbol) === -1).toBe(true);
@@ -89,7 +89,7 @@ describe("BoardGenerator", () => {
             const expected = [8, 8, 8, -1, -1, -1, 8, 8, -1, -1, -1, -1, 8, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 8, -1, -1];
 
             // Act
-            const result = boardGenerator.explodeAndRefill(board, [8]);
+            const result = boardGenerator.explodeAndRefill(board, [8], []);
 
             // Assert
             expect(result.explodedSymbols?.join(",")).toBe(expected.join(","));
@@ -101,10 +101,28 @@ describe("BoardGenerator", () => {
             const expected = [-1, -1, -1, 0, 0, 0, -1, -1, -1, -1, 0, 0, -1, -1, -1, -1, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0];
 
             // Act
-            const result = boardGenerator.explodeAndRefill(board, [8]);
+            const result = boardGenerator.explodeAndRefill(board, [8], []);
 
             // Assert
             expect(result.newSymbols).toStrictEqual(expected);
+        });
+
+        it("return new multipliers corresponding with board", () => {
+            // Arrange
+            const board = [8, 8, 8, 2, 2, 1, 8, 8, 4, 3, 1, 10, 8, 8, 10, 2, 1, 5, 3, 9, 9, 5, 6, 4, 9, 5, 7, 8, 1, 2];
+
+            boardGenerator.getSymbolGenerator = () =>
+                ({
+                    randomSymbols: () => [0, 0, 10, 0, 0, 10, 0, 0],
+                } as any);
+
+            (boardGenerator as any).multiplierGenerator.generate = () => [3, 4];
+
+            // Act
+            const result = boardGenerator.explodeAndRefill(board, [8], [1, 2]);
+
+            // Assert
+            expect(result.multipliers).toStrictEqual([3, 1, 2, 4]);
         });
     });
 
