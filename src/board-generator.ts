@@ -1,4 +1,24 @@
-import { both, complement, concat, count, equals, flatten, head, includes, map, pipe, reject, repeat, splitAt, splitEvery, __ } from "ramda";
+import {
+    both,
+    clone,
+    complement,
+    concat,
+    count,
+    equals,
+    flatten,
+    head,
+    includes,
+    isNil,
+    last,
+    map,
+    pipe,
+    reject,
+    repeat,
+    splitAt,
+    splitEvery,
+    tail,
+    __,
+} from "ramda";
 
 import defaultDefinition from "./default-definition";
 import { Difficulty } from "./difficulties";
@@ -19,6 +39,8 @@ export default class BoardGenerator {
     private difficulty: Difficulty;
     private readonly definition: any;
     private readonly multiplierGenerator: MultiplierGenerator;
+    private refillSymbols: number[];
+    private refillMultipliers: number[];
 
     constructor(boardDefinition: any = null) {
         this.definition = boardDefinition ?? defaultDefinition;
@@ -56,7 +78,7 @@ export default class BoardGenerator {
         const isSpecialSymbol = equals(specialSymbol);
 
         const numberOfSymbols = count(isWinningSymbol, board);
-        const newSymbols = this.getSymbolGenerator().randomSymbols(numberOfSymbols);
+        const newSymbols = this.getRefillSymbols(numberOfSymbols);
 
         const exploded = replace(complement(isWinningSymbol), Reel.NoSymbol, board);
         const remained = replace(isWinningSymbol, Reel.NoSymbol, board);
@@ -95,8 +117,9 @@ export default class BoardGenerator {
 
         const getReels = splitEvery(symbolsOnReel);
         const removeNoSymbolInList = reject(equals(Reel.NoSymbol)) as (a: any[]) => any;
-        const appendNoSymbolToList = concat(__, emptyReel) as (a: any[]) => any;
-        const collapseReel = pipe(removeNoSymbolInList, appendNoSymbolToList, splitAt(symbolsOnReel), head);
+        const prependNoSymbolToList = concat(emptyReel) as (a: any[]) => any;
+        const splitSymbols = (list: number[]) => splitAt(list.length - symbolsOnReel, list);
+        const collapseReel = pipe(removeNoSymbolInList, prependNoSymbolToList, splitSymbols, last);
         const collapseBoard = pipe(getReels, map(collapseReel), flatten) as <T>(a: T[]) => T[];
 
         return collapseBoard(board);
@@ -112,5 +135,22 @@ export default class BoardGenerator {
             replace(both(complement(isMultiplierSymbol), complement(isNoSymbol)), specialSymbol),
             replaceEach(isMultiplierSymbol, multiplierValues)
         )(board) as any as number[];
+    }
+
+    setRefillSymbols(symbols: number[], multipliers: number[]) {
+        !isNil(symbols) && (this.refillSymbols = symbols);
+        !isNil(multipliers) && (this.refillMultipliers = symbols);
+    }
+
+    getRefillSymbols(size: number): number[] {
+        if (isNil(this.refillSymbols)) {
+            return this.getSymbolGenerator().randomSymbols(size);
+        } else {
+            const symbols = clone(this.refillSymbols);
+
+            this.refillSymbols = [];
+
+            return symbols;
+        }
     }
 }

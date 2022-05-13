@@ -118,3 +118,17 @@ export default function start(definition: any, numberOfRounds = 1000, debug = fa
 
     return { statistic, rounds };
 }
+
+export const getStatistics = (definition: any, times: number, batchSize: number) => {
+    const statistics: Statistic[] = [];
+    const allRounds: Round[][] = [];
+
+    for (let i = 0; i < times; i++) {
+        const { statistic, rounds } = start(definition, batchSize);
+
+        statistics.push(statistic);
+        allRounds.push(rounds);
+    }
+
+    return { statistics, rounds: allRounds };
+};

@@ -78,6 +78,7 @@
         }
     },
     "optionalDependencies": {
+        "prom-client": "14.0.1",
         "sc-cascading-slot-base": "1.0.1-beta.5"
     }
 }

@@ -1,75 +1,102 @@
-import runStatistic from "./statistic-runner";
-import { writeFileSync } from "fs";
+import { getStatistics } from "./statistic-runner";
 import defaultDefinition from "../default-definition";
-import { mean, __ } from "ramda";
+import { mean, range, __ } from "ramda";
 import { Difficulty } from "../difficulties";
-import { getPercents, getValues, variance } from "./statistic-calculator";
+import { writeFileSync } from "fs";
+import { getPercents, getValues, Statistic, variance } from "./statistic-calculator";
 
-const numberOfRounds = 1000;
+const calculateReport = (statistics: Statistic[], rounds: number) => ({
+    rtp: mean(getValues(["rtp"], statistics)),
+    rtpDeviation: Math.sqrt(variance(getValues(["rtp"], statistics))),
+    multiplierRatio: mean(getPercents(["totalMultipliers"], statistics, rounds)),
+    freeSpinsRatio: mean(getPercents(["winFreeSpins"], statistics, rounds)),
+    tumbleWinRatio: mean(getPercents(["winingRounds"], statistics, rounds)),
+});
 
-const getStatistics = (definition: any, times: number) => {
-    const statistics = [];
+const getNumberOfSymbols = (factor: number, multiplierSymbols: number) => {
+    const symbolHeuristic = {
+        0: 1.2,
+        1: 10 / 9,
+        2: 1.2,
+        3: 1.25,
+        4: 1.2,
+        5: 1.25,
+        6: 1.25,
+        7: 2,
+        8: 1,
+        9: 2 / 3,
+        10: multiplierSymbols,
+    };
 
-    for (let i = 0; i < times; i++) {
-        const { statistic } = runStatistic(definition, numberOfRounds);
+    const multiplier = { 10: symbolHeuristic[10] };
+    const scatter = { 9: Math.round(factor * symbolHeuristic[9]) };
+    const normalSymbols = range(0, 9)
+        .reverse()
+        .reduce((result, symbol) => {
+            if (symbol === 8) {
+                result[symbol] = factor * symbolHeuristic[symbol];
+            } else {
+                result[symbol] = Math.round(symbolHeuristic[symbol] * result[symbol + 1]);
+            }
 
-        statistics.push(statistic);
+            return result;
+        }, {} as Record<number, number>);
+
+    return Object.assign({}, normalSymbols, scatter, multiplier);
+};
+
+const getDefinition = (x: number, multiplierSymbols: number) =>
+    Object.assign(
+        {},
+        defaultDefinition,
+        { difficulty: Difficulty.Medium },
+        {
+            numberOfSymbolsByDifficulty: {
+                [Difficulty.Medium]: getNumberOfSymbols(x, multiplierSymbols),
+            },
+        }
+    );
+
+const countSymbols = (statistics: Statistic[]): Record<number, Record<number, number>> => {
+    const result: Record<number, number[]> = {};
+
+    range(0, 11).forEach((symbol) => {
+        range(1, 31).forEach((numberOfSymbols) => {
+            statistics.forEach((statistic) => {
+                if (!result[symbol]) {
+                    result[symbol] = range(1, 31).map(() => 0);
+                }
+
+                result[symbol][numberOfSymbols - 1] += statistic.symbols.counts[symbol][numberOfSymbols] || 0;
+            });
+        });
+    });
+
+    return result;
+};
+
+const startGenerate = (maximumFactor: number, maximumMultiplierSymbols: number) => {
+    const batchSize = 1000;
+    const times = 2;
+    const result = [];
+
+    for (let multiplierSymbols = 1; multiplierSymbols <= maximumMultiplierSymbols; multiplierSymbols++) {
+        for (let factor = 12; factor <= maximumFactor; factor++) {
+            const definition = getDefinition(factor, multiplierSymbols);
+            const { statistics } = getStatistics(definition, times, batchSize);
+            const report = calculateReport(statistics, batchSize);
+            const symbols = countSymbols(statistics);
+            const configs = range(0, 11).map((symbol) => definition.numberOfSymbolsByDifficulty[Difficulty.Medium][symbol]);
+
+            result.push({ report, symbols, configs });
+
+            console.log(multiplierSymbols, factor, report.rtp, report.rtpDeviation);
+
+            writeFileSync("reports/report.json", JSON.stringify(result, null, 2));
+        }
     }
 
-    return statistics;
+    return result;
 };
 
-const definition = Object.assign({}, defaultDefinition, { difficulty: Difficulty.Hard });
-const statistics = getStatistics(definition, 1000);
-
-const report = {
-    rtp: mean(getValues(["rtp"], statistics)),
-    rtpVariance: variance(getValues(["rtp"], statistics)),
-    multipliers: mean(getPercents(["totalMultipliers"], statistics, numberOfRounds)),
-    freeSpins: mean(getPercents(["winFreeSpins"], statistics, numberOfRounds)),
-    win: mean(getPercents(["winingRounds"], statistics, numberOfRounds)),
-};
-
-writeFileSync(`./reports/statistics-${definition.difficulty}.json`, JSON.stringify(statistics, null, 2));
-
-console.log(report);
-
-/**
-Rounds: 10K
- * HARD
-{
-  rtp: 0.934137,
-  rtpVariance: 0.008750213980999993,
-  multipliers: 0.044399999999999995,
-  freeSpins: 0.0047,
-  win: 0.44210000000000005
-}
-
- * MEDIUM
-{
-  rtp: 0.888067,
-  rtpVariance: 0.002706068440999997,
-  multipliers: 0.029900000000000003,
-  freeSpins: 0.0034000000000000002,
-  win: 0.4473
-}
-
- * EASY
-{
-  rtp: 0.9500704000000004,
-  rtpVariance: 0.0016402011966399992,
-  multipliers: 0.047020000000000006,
-  freeSpins: 0.00364,
-  win: 0.44162
-}
-
- * TRIAL
-{
-  rtp: 0.9863274000000004,
-  rtpVariance: 0.002478963148840008,
-  multipliers: 0.05636,
-  freeSpins: 0.0032,
-  win: 0.43474
-}
-
- */
+startGenerate(40, 5);
