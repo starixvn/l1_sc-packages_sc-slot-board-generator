@@ -97,32 +97,30 @@ const countMultipliers = (statistics: Statistic[]): Record<number, number> => {
     return result;
 };
 
-const startGenerate = (maximumFactor: number, maximumMultiplierSymbols: number, batchSize: number = 1000, times: number = 2) => {
-    console.log({ maximumFactor, maximumMultiplierSymbols, batchSize, times });
+const startGenerate = (maximumFactor: number, multiplierSymbols: number, batchSize: number = 1000, times: number = 2) => {
+    console.log({ maximumFactor, multiplierSymbols, batchSize, times });
     const result = [];
 
-    for (let multiplierSymbols = 1; multiplierSymbols <= maximumMultiplierSymbols; multiplierSymbols++) {
-        for (let factor = 12; factor <= maximumFactor; factor++) {
-            const definition = getDefinition(factor, multiplierSymbols);
-            const { statistics } = getStatistics(definition, times, batchSize);
-            const report = calculateReport(statistics, batchSize);
-            const symbols = countSymbols(statistics);
-            const configs = range(0, 11).map((symbol) => definition.numberOfSymbolsByDifficulty[Difficulty.Medium][symbol]);
-            const multipliers = countMultipliers(statistics);
+    for (let factor = 12; factor <= maximumFactor; factor++) {
+        const definition = getDefinition(factor, multiplierSymbols);
+        const { statistics } = getStatistics(definition, times, batchSize);
+        const report = calculateReport(statistics, batchSize);
+        const symbols = countSymbols(statistics);
+        const configs = range(0, 11).map((symbol) => definition.numberOfSymbolsByDifficulty[Difficulty.Medium][symbol]);
+        const multipliers = countMultipliers(statistics);
 
-            result.push({ report, symbols, configs, multipliers });
+        result.push({ report, symbols, configs, multipliers });
 
-            console.log(multiplierSymbols, factor, report.rtp, report.rtpDeviation);
+        console.log(multiplierSymbols, factor, report.rtp, report.rtpDeviation);
 
-            writeFileSync(`reports/report-${batchSize}-${times}-${maximumFactor}-${maximumMultiplierSymbols}.json`, JSON.stringify(result, null, 2));
-        }
+        writeFileSync(`reports/report-${batchSize}-${times}-${maximumFactor}-${multiplierSymbols}.json`, JSON.stringify(result, null, 2));
     }
 
     return result;
 };
 
 const factor = Number(process.argv[2] || 40);
-const multiplier = Number(process.argv[3] || 5);
+const multiplier = Number(process.argv[3] || 1);
 const batchSize = Number(process.argv[4] || 1000);
 const times = Number(process.argv[5] || 500);
 
