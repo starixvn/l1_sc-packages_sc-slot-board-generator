@@ -17,8 +17,7 @@
         "betaver": "npm version prerelease --preid beta",
         "pubbeta": "npm publish --registry http://npm.lumigame.com --tag beta",
         "semantic-release": "semantic-release",
-        "statistic": "node --experimental-specifier-resolution=node --loader ts-node/esm ./src/statistics/statistic-reporter.ts",
-        "generate-symbols": "node --experimental-specifier-resolution=node --loader ts-node/esm ./src/statistics/number-of-symbols-generator.ts"
+        "statistic": "node --experimental-specifier-resolution=node --loader ts-node/esm ./src/statistics/statistic-reporter.ts"
     },
     "jestSonar": {
         "reportPath": "reports",

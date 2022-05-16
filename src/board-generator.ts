@@ -6,8 +6,8 @@ import {
     count,
     equals,
     flatten,
-    head,
     includes,
+    isEmpty,
     isNil,
     last,
     map,
@@ -16,7 +16,6 @@ import {
     repeat,
     splitAt,
     splitEvery,
-    tail,
     __,
 } from "ramda";
 
@@ -91,7 +90,7 @@ export default class BoardGenerator {
 
         const oldMultiplierValueBoard = this.convertToMultiplierValueBoard(collapsed, oldMultipliers);
 
-        const newMultipliers = this.multiplierGenerator.generate(newSymbols);
+        const newMultipliers = this.getMultiplierValues(newSymbols);
         const newMultiplierValueBoard = this.convertToMultiplierValueBoard(newSymbols, newMultipliers);
 
         const mergedMultiplierValueBoard = replaceEach(isNoSymbol, newMultiplierValueBoard, oldMultiplierValueBoard);
@@ -138,12 +137,24 @@ export default class BoardGenerator {
     }
 
     setRefillSymbols(symbols: number[], multipliers: number[]) {
-        !isNil(symbols) && (this.refillSymbols = symbols);
-        !isNil(multipliers) && (this.refillMultipliers = symbols);
+        !isEmpty(symbols) && (this.refillSymbols = symbols);
+        !isEmpty(multipliers) && (this.refillMultipliers = multipliers);
+    }
+
+    getMultiplierValues(board: number[]) {
+        if (isNil(this.refillMultipliers) || isEmpty(this.refillMultipliers)) {
+            return this.multiplierGenerator.generate(board);
+        } else {
+            const multipliers = clone(this.refillMultipliers);
+
+            this.refillMultipliers = [];
+
+            return multipliers;
+        }
     }
 
     getRefillSymbols(size: number): number[] {
-        if (isNil(this.refillSymbols)) {
+        if (isNil(this.refillSymbols) || isEmpty(this.refillSymbols)) {
             return this.getSymbolGenerator().randomSymbols(size);
         } else {
             const symbols = clone(this.refillSymbols);

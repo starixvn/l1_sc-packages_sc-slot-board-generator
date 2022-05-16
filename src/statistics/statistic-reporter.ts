@@ -75,9 +75,8 @@ const countSymbols = (statistics: Statistic[]): Record<number, Record<number, nu
     return result;
 };
 
-const startGenerate = (maximumFactor: number, maximumMultiplierSymbols: number) => {
-    const batchSize = 1000;
-    const times = 2;
+const startGenerate = (maximumFactor: number, maximumMultiplierSymbols: number, batchSize: number = 1000, times: number = 2) => {
+    console.log({ maximumFactor, maximumMultiplierSymbols, batchSize, times });
     const result = [];
 
     for (let multiplierSymbols = 1; multiplierSymbols <= maximumMultiplierSymbols; multiplierSymbols++) {
@@ -92,11 +91,16 @@ const startGenerate = (maximumFactor: number, maximumMultiplierSymbols: number) 
 
             console.log(multiplierSymbols, factor, report.rtp, report.rtpDeviation);
 
-            writeFileSync("reports/report.json", JSON.stringify(result, null, 2));
+            writeFileSync(`reports/report-${batchSize}-${times}-${maximumFactor}-${maximumMultiplierSymbols}.json`, JSON.stringify(result, null, 2));
         }
     }
 
     return result;
 };
 
-startGenerate(40, 5);
+const factor = Number(process.argv[2] || 40);
+const multiplier = Number(process.argv[3] || 5);
+const batchSize = Number(process.argv[4] || 1000);
+const times = Number(process.argv[5] || 500);
+
+startGenerate(factor, multiplier, batchSize, times);
