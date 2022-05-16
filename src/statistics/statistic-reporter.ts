@@ -1,6 +1,6 @@
 import { getStatistics } from "./statistic-runner";
 import defaultDefinition from "../default-definition";
-import { mean, range, __ } from "ramda";
+import { map, max, mean, range, __ } from "ramda";
 import { Difficulty } from "../difficulties";
 import { writeFileSync } from "fs";
 import { getPercents, getValues, Statistic, variance } from "./statistic-calculator";
@@ -75,6 +75,28 @@ const countSymbols = (statistics: Statistic[]): Record<number, Record<number, nu
     return result;
 };
 
+const countMultipliers = (statistics: Statistic[]): Record<number, number> => {
+    const result: Record<number, number> = {};
+    const maximumMultiplier = Math.max(
+        ...map(
+            parseInt,
+            statistics.flatMap((s) => Object.keys(s.multipliers))
+        )
+    );
+
+    range(0, maximumMultiplier + 1).forEach((value) => {
+        statistics.forEach((statistic) => {
+            if (!result[value]) {
+                result[value] = statistic.multipliers[value] || 0;
+            } else {
+                result[value] += statistic.multipliers[value] || 0;
+            }
+        });
+    });
+
+    return result;
+};
+
 const startGenerate = (maximumFactor: number, maximumMultiplierSymbols: number, batchSize: number = 1000, times: number = 2) => {
     console.log({ maximumFactor, maximumMultiplierSymbols, batchSize, times });
     const result = [];
@@ -86,8 +108,9 @@ const startGenerate = (maximumFactor: number, maximumMultiplierSymbols: number, 
             const report = calculateReport(statistics, batchSize);
             const symbols = countSymbols(statistics);
             const configs = range(0, 11).map((symbol) => definition.numberOfSymbolsByDifficulty[Difficulty.Medium][symbol]);
+            const multipliers = countMultipliers(statistics);
 
-            result.push({ report, symbols, configs });
+            result.push({ report, symbols, configs, multipliers });
 
             console.log(multiplierSymbols, factor, report.rtp, report.rtpDeviation);
 
