@@ -8,5 +8,5 @@
 
 lib/
 .vscode
-.cts
-.map
+*.cts
+*.map
