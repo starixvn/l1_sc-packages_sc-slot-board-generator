@@ -18,11 +18,10 @@ export default class SymbolsGenerator {
     public static readonly TotalItemPerReel: number = 200;
 
     private readonly chance: Chance.Chance;
+    private readonly board: number[] = [];
+    private readonly numberOfSymbols: Record<number, number>;
 
-    private board: number[] = [];
-    private numberOfSymbols: Record<number, number>; // {symbol: value}
-
-    constructor(numberOfSymbols: Record<number, number>, numberOfShuffles: number = 3) {
+    constructor(numberOfSymbols: Record<number, number>, numberOfShuffles = 3) {
         this.chance = new Chance();
         this.numberOfSymbols = numberOfSymbols;
 
