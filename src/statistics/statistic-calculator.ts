@@ -64,7 +64,7 @@ export const calculateCommonProperties =
         statistic.totalFreeSpins += round.settlementResult.freeSpins.odds;
         statistic.totalAdditionFreeSpins += round.freeSpin ? round.settlementResult.freeSpins.odds : 0;
         statistic.rtp = divide(statistic.totalPayout, statistic.totalBetAmount || 1);
-        statistic.totalMultipliers += compose(length, prop("multipliers"), last)(round.settlementResult.tumbles);
+        statistic.totalMultipliers += compose(length, prop("multipliers") as any, last)(round.settlementResult.tumbles);
         statistic.winFreeSpins += round.settlementResult.freeSpins.odds ? 1 : 0;
 
         return statistic;
@@ -94,7 +94,9 @@ export const calculateRoundProperty =
 export const countWinningSymbols =
     (round: Round) =>
     (statistic: Statistic): Statistic => {
-        const counts = map(compose(countBy(parseInt), split(","), prop("originalBoard")))(round.settlementResult.tumbles);
+        const counts = map<any, number>(compose<any, any, any, any>(countBy(parseInt), split(","), prop("originalBoard")))(
+            round.settlementResult.tumbles
+        );
 
         counts.forEach((count) =>
             Object.entries(count).forEach(([symbol, value]) => {

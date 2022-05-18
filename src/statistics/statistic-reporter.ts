@@ -2,7 +2,7 @@ import { getStatistics } from "./statistic-runner";
 import defaultDefinition from "../default-definition";
 import defaultOdds from "./default-odds";
 import boardDefinition from "../board-definition";
-import { map, max, mean, range, __ } from "ramda";
+import { map, mean, range, __ } from "ramda";
 import { Difficulty } from "../difficulties";
 import { writeFileSync } from "fs";
 import { getPercents, getValues, Statistic, variance } from "./statistic-calculator";
@@ -107,12 +107,12 @@ const startGenerate = (
     batchSize: number = 1000,
     times: number = 2,
     betCoins = [0.1],
-    betLevels = [5]
+    betLevels = [5],
+    singleFactor: boolean = false
 ) => {
     console.log({ maximumFactor, multiplierSymbols, batchSize, times });
     const result = [];
-
-    for (let factor = 12; factor <= maximumFactor; factor++) {
+    const executeSingleFactor = (factor: number) => {
         const definition = getDefinition(factor, multiplierSymbols);
         const { statistics } = getStatistics(definition, times, batchSize, betCoins, betLevels);
         const report = calculateReport(statistics, batchSize);
@@ -125,6 +125,14 @@ const startGenerate = (
         console.log(multiplierSymbols, factor, report.rtp, report.rtpDeviation);
 
         writeFileSync(`reports/report-${batchSize}-${times}-${maximumFactor}-${multiplierSymbols}.json`, JSON.stringify(result, null, 2));
+    };
+
+    if (singleFactor) {
+        executeSingleFactor(maximumFactor);
+    } else {
+        for (let factor = 12; factor <= maximumFactor; factor++) {
+            executeSingleFactor(factor);
+        }
     }
 
     return result;
@@ -134,7 +142,8 @@ const factor = Number(process.argv[2] || 40);
 const multiplier = Number(process.argv[3] || 1);
 const batchSize = Number(process.argv[4] || 1000);
 const times = Number(process.argv[5] || 50);
-const betCoins = [0.1];
-const betLevels = [5];
+const singleFactor = process.argv[6] === "true";
+const betCoins = [0.01, 0.05, 0.1, 0.5];
+const betLevels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-startGenerate(factor, multiplier, batchSize, times, betCoins, betLevels);
+startGenerate(factor, multiplier, batchSize, times, betCoins, betLevels, singleFactor);

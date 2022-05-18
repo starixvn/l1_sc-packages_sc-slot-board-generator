@@ -12,7 +12,7 @@ export default function start(
     betLevel = 5,
     debug = false
 ): { statistic: Statistic; rounds: Round[] } {
-    const generator = new BoardGenerator(definition);
+    const generator = new BoardGenerator(definition.boardSettings, definition.multiplier, definition);
 
     generator.setDifficulty(definition.difficulty);
 
