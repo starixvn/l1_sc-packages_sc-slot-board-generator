@@ -1,3 +1,3 @@
-import BoardGenerator from "./board-generator";
+import { BoardGenerator } from "./board-generator";
 
 export { BoardGenerator };
