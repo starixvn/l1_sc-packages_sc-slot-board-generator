@@ -20,6 +20,7 @@ import {
 } from "ramda";
 
 import defaultDefinition from "./default-definition";
+import boardDefinition from "./board-definition";
 import { Difficulty } from "./difficulties";
 import MultiplierGenerator from "./multiplier-generator";
 import SymbolsGenerator from "./symbols-generator";
@@ -32,24 +33,37 @@ export interface IBoard {
     multipliers: number[];
 }
 
-export default class BoardGenerator {
+export interface BoardSettings {
+    reels: number;
+    symbolsOnReel: number;
+    numberOfSymbols: number;
+    numberOfShuffles: number;
+}
+
+export interface MultiplierConfig {
+    symbol: number;
+    min: number;
+    max: number;
+}
+
+export class BoardGenerator {
     public readonly NoSymbol: number = -1;
     public readonly SpecialSymbol: number = -2;
-    private difficulty: Difficulty;
+    private readonly settings: BoardSettings;
     private readonly definition: any;
     private readonly multiplierGenerator: MultiplierGenerator;
+
+    private difficulty: Difficulty;
+
     private refillSymbols: number[];
     private refillMultipliers: number[];
 
-    constructor(boardDefinition: any = null) {
-        this.definition = boardDefinition ?? defaultDefinition;
+    constructor(settings: BoardSettings, multiplierConfig: MultiplierConfig, definition: any = null) {
+        this.definition = definition ?? boardDefinition;
         this.difficulty = Difficulty.Medium;
+        this.settings = settings;
 
-        this.multiplierGenerator = new MultiplierGenerator(
-            this.definition.multiplier.symbol,
-            this.definition.multiplier.min,
-            this.definition.multiplier.max
-        );
+        this.multiplierGenerator = new MultiplierGenerator(multiplierConfig.symbol, multiplierConfig.min, multiplierConfig.max);
     }
 
     setDifficulty(difficulty: Difficulty): void {
@@ -60,9 +74,13 @@ export default class BoardGenerator {
         return this.difficulty;
     }
 
+    updateMultiplierConfig(min: number, max: number): void {
+        this.multiplierGenerator.update(min, max);
+    }
+
     generate(): IBoard {
         const generator = this.getSymbolGenerator();
-        const board = generator.randomSymbols(this.definition.reels * this.definition.symbolsOnReel);
+        const board = generator.randomSymbols(this.settings.reels * this.settings.symbolsOnReel);
 
         return {
             newBoard: board,
@@ -106,11 +124,11 @@ export default class BoardGenerator {
     }
 
     getSymbolGenerator(): SymbolsGenerator {
-        return new SymbolsGenerator(this.definition.numberOfSymbolsByDifficulty[this.difficulty], this.definition.numberOfShuffles);
+        return new SymbolsGenerator(this.definition.mode[this.difficulty], this.settings.numberOfShuffles);
     }
 
     collapse(board: number[]): number[] {
-        const symbolsOnReel = this.definition.symbolsOnReel;
+        const symbolsOnReel = this.settings.symbolsOnReel;
         const emptyReel = repeat(this.NoSymbol, symbolsOnReel);
 
         const getReels = splitEvery(symbolsOnReel);

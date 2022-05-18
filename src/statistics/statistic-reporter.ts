@@ -1,6 +1,8 @@
 import { getStatistics } from "./statistic-runner";
 import defaultDefinition from "../default-definition";
-import { map, mean, range, __ } from "ramda";
+import defaultOdds from "./default-odds";
+import boardDefinition from "../board-definition";
+import { map, max, mean, range, __ } from "ramda";
 import { Difficulty } from "../difficulties";
 import { writeFileSync } from "fs";
 import { getPercents, getValues, Statistic, variance } from "./statistic-calculator";
@@ -49,9 +51,11 @@ const getDefinition = (x: number, multiplierSymbols: number) =>
     Object.assign(
         {},
         defaultDefinition,
+        defaultOdds,
+        { boardDefinition: boardDefinition },
         { difficulty: Difficulty.Medium },
         {
-            numberOfSymbolsByDifficulty: {
+            mode: {
                 [Difficulty.Medium]: getNumberOfSymbols(x, multiplierSymbols),
             },
         }
@@ -113,7 +117,7 @@ const startGenerate = (
         const { statistics } = getStatistics(definition, times, batchSize, betCoins, betLevels);
         const report = calculateReport(statistics, batchSize);
         const symbols = countSymbols(statistics);
-        const configs = range(0, 11).map((symbol) => definition.numberOfSymbolsByDifficulty[Difficulty.Medium][symbol]);
+        const configs = range(0, 11).map((symbol) => definition.mode[Difficulty.Medium][symbol]);
         const multipliers = countMultipliers(statistics);
 
         result.push({ report, symbols, configs, multipliers });

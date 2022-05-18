@@ -3,9 +3,10 @@ import { max, range, repeat } from "ramda";
 
 export default class MultiplierGenerator {
     private readonly chance: Chance.Chance;
-    private readonly min: number;
-    private readonly max: number;
     private readonly multiplierSymbol: number;
+
+    private min: number;
+    private max: number;
 
     constructor(multiplierSymbol: number, min: number, max: number) {
         this.multiplierSymbol = multiplierSymbol;
@@ -32,5 +33,10 @@ export default class MultiplierGenerator {
         });
 
         return multipliers;
+    }
+
+    update(min: number, max: number) {
+        this.min = min;
+        this.max = max;
     }
 }

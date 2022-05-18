@@ -1,7 +1,7 @@
 import RoundCalculator from "sc-cascading-slot-base/src/board/round-calculator";
 import TumbleCalculator from "sc-cascading-slot-base/src/board/tumble-calculator";
 import { prop } from "ramda";
-import BoardGenerator from "../board-generator";
+import { BoardGenerator } from "../board-generator";
 import { calculateStatistic, Round, Statistic } from "./statistic-calculator";
 import { Chance } from "chance";
 

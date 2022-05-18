@@ -1,6 +1,7 @@
 import { clone } from "ramda";
-import BoardGenerator from "../src/board-generator";
+import { BoardGenerator } from "../src/board-generator";
 import defaultDefinition from "../src/default-definition";
+import boardDefinition from "../src/board-definition";
 import { Difficulty } from "../src/difficulties";
 
 describe("BoardGenerator", () => {
@@ -11,18 +12,14 @@ describe("BoardGenerator", () => {
 
         const definition = clone(defaultDefinition) as any;
 
-        definition.numberOfSymbolsByDifficulty[Difficulty.Medium] = {
-            0: 30,
-        };
-
-        boardGenerator = new BoardGenerator(definition);
+        boardGenerator = new BoardGenerator(defaultDefinition.boardSettings, defaultDefinition.multiplier, boardDefinition);
     });
 
     describe("constructor", () => {
         describe("when call without parameter", () => {
             it("should create an instance with default configs", () => {
                 // Act
-                const generator = new BoardGenerator();
+                const generator = new BoardGenerator(defaultDefinition.boardSettings, defaultDefinition.multiplier, boardDefinition);
 
                 // Assert
                 expect(generator).toBeDefined();
@@ -56,7 +53,7 @@ describe("BoardGenerator", () => {
             const result = boardGenerator.generate();
 
             // Assert
-            expect(result.newBoard.length).toEqual(defaultDefinition.reels * defaultDefinition.symbolsOnReel);
+            expect(result.newBoard.length).toEqual(defaultDefinition.boardSettings.reels * defaultDefinition.boardSettings.symbolsOnReel);
         });
     });
 
@@ -69,7 +66,7 @@ describe("BoardGenerator", () => {
             const result = boardGenerator.explodeAndRefill(board.newBoard, [2], []);
 
             // Assert
-            expect(result.newBoard.length).toEqual(defaultDefinition.reels * defaultDefinition.symbolsOnReel);
+            expect(result.newBoard.length).toEqual(defaultDefinition.boardSettings.reels * defaultDefinition.boardSettings.symbolsOnReel);
         });
 
         it("return new board without NoSymbol", () => {
