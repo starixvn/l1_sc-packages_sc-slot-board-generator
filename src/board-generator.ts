@@ -90,7 +90,7 @@ export default class BoardGenerator {
 
         const oldMultiplierValueBoard = this.convertToMultiplierValueBoard(collapsed, oldMultipliers);
 
-        const newMultipliers = this.getMultiplierValues(newSymbols);
+        const newMultipliers = this.getMultiplierValues(newSymbols, oldMultipliers);
         const newMultiplierValueBoard = this.convertToMultiplierValueBoard(newSymbols, newMultipliers);
 
         const mergedMultiplierValueBoard = replaceEach(isNoSymbol, newMultiplierValueBoard, oldMultiplierValueBoard);
@@ -141,9 +141,9 @@ export default class BoardGenerator {
         !isEmpty(multipliers) && (this.refillMultipliers = multipliers);
     }
 
-    getMultiplierValues(board: number[]) {
+    getMultiplierValues(board: number[], oldMultipliers: number[]) {
         if (isNil(this.refillMultipliers) || isEmpty(this.refillMultipliers)) {
-            return this.multiplierGenerator.generate(board);
+            return this.multiplierGenerator.generate(board, oldMultipliers);
         } else {
             const multipliers = clone(this.refillMultipliers);
 
