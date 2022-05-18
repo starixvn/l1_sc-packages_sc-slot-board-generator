@@ -1,6 +1,6 @@
 import { getStatistics } from "./statistic-runner";
 import defaultDefinition from "../default-definition";
-import { map, max, mean, range, __ } from "ramda";
+import { map, mean, range, __ } from "ramda";
 import { Difficulty } from "../difficulties";
 import { writeFileSync } from "fs";
 import { getPercents, getValues, Statistic, variance } from "./statistic-calculator";
@@ -97,13 +97,20 @@ const countMultipliers = (statistics: Statistic[]): Record<number, number> => {
     return result;
 };
 
-const startGenerate = (maximumFactor: number, multiplierSymbols: number, batchSize: number = 1000, times: number = 2) => {
+const startGenerate = (
+    maximumFactor: number,
+    multiplierSymbols: number,
+    batchSize: number = 1000,
+    times: number = 2,
+    betCoins = [0.1],
+    betLevels = [5]
+) => {
     console.log({ maximumFactor, multiplierSymbols, batchSize, times });
     const result = [];
 
     for (let factor = 12; factor <= maximumFactor; factor++) {
         const definition = getDefinition(factor, multiplierSymbols);
-        const { statistics } = getStatistics(definition, times, batchSize);
+        const { statistics } = getStatistics(definition, times, batchSize, betCoins, betLevels);
         const report = calculateReport(statistics, batchSize);
         const symbols = countSymbols(statistics);
         const configs = range(0, 11).map((symbol) => definition.numberOfSymbolsByDifficulty[Difficulty.Medium][symbol]);
@@ -122,6 +129,8 @@ const startGenerate = (maximumFactor: number, multiplierSymbols: number, batchSi
 const factor = Number(process.argv[2] || 40);
 const multiplier = Number(process.argv[3] || 1);
 const batchSize = Number(process.argv[4] || 1000);
-const times = Number(process.argv[5] || 500);
+const times = Number(process.argv[5] || 50);
+const betCoins = [0.1];
+const betLevels = [5];
 
-startGenerate(factor, multiplier, batchSize, times);
+startGenerate(factor, multiplier, batchSize, times, betCoins, betLevels);

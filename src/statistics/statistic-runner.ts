@@ -3,8 +3,15 @@ import TumbleCalculator from "sc-cascading-slot-base/src/board/tumble-calculator
 import { prop } from "ramda";
 import BoardGenerator from "../board-generator";
 import { calculateStatistic, Round, Statistic } from "./statistic-calculator";
+import { Chance } from "chance";
 
-export default function start(definition: any, numberOfRounds = 1000, debug = false): { statistic: Statistic; rounds: Round[] } {
+export default function start(
+    definition: any,
+    numberOfRounds = 1000,
+    coinValue = 0.1,
+    betLevel = 5,
+    debug = false
+): { statistic: Statistic; rounds: Round[] } {
     const generator = new BoardGenerator(definition);
 
     generator.setDifficulty(definition.difficulty);
@@ -55,8 +62,8 @@ export default function start(definition: any, numberOfRounds = 1000, debug = fa
             const freeSpinRound: Round = {
                 id: round.id,
                 freeSpinId: j,
-                coinValue: 0.1,
-                betLevel: 5,
+                coinValue,
+                betLevel,
                 betMultiplier: 20,
                 totalAmount: 0,
                 odds,
@@ -86,10 +93,10 @@ export default function start(definition: any, numberOfRounds = 1000, debug = fa
 
         const round: Round = {
             id: i,
-            coinValue: 0.1,
-            betLevel: 5,
+            coinValue,
+            betLevel,
             betMultiplier: 20,
-            totalAmount: 0.1 * 5 * 20,
+            totalAmount: coinValue * betLevel * 20,
             odds,
         };
 
@@ -119,12 +126,16 @@ export default function start(definition: any, numberOfRounds = 1000, debug = fa
     return { statistic, rounds };
 }
 
-export const getStatistics = (definition: any, times: number, batchSize: number) => {
+export const getStatistics = (definition: any, times: number, batchSize: number, coinValues: number[], betLevels: number[]) => {
     const statistics: Statistic[] = [];
     const allRounds: Round[][] = [];
+    const betAmounts = coinValues.flatMap((coinValue) => betLevels.map((betLevel) => ({ betLevel, coinValue })));
+    const chance = new Chance();
+    const betAmount = chance.pickone(betAmounts);
 
+    console.log(betAmount);
     for (let i = 0; i < times; i++) {
-        const { statistic, rounds } = start(definition, batchSize);
+        const { statistic, rounds } = start(definition, batchSize, betAmount.coinValue, betAmount.betLevel);
 
         statistics.push(statistic);
         allRounds.push(rounds);
