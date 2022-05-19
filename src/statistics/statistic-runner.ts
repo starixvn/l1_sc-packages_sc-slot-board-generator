@@ -131,10 +131,11 @@ export const getStatistics = (definition: any, times: number, batchSize: number,
     const allRounds: Round[][] = [];
     const betAmounts = coinValues.flatMap((coinValue) => betLevels.map((betLevel) => ({ betLevel, coinValue })));
     const chance = new Chance();
-    const betAmount = chance.pickone(betAmounts);
 
-    console.log(betAmount);
     for (let i = 0; i < times; i++) {
+        const betAmount = chance.pickone(betAmounts);
+        console.log(betAmount);
+
         const { statistic, rounds } = start(definition, batchSize, betAmount.coinValue, betAmount.betLevel);
 
         statistics.push(statistic);
