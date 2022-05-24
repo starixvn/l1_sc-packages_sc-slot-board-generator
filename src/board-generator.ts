@@ -58,9 +58,9 @@ export class BoardGenerator {
     private refillSymbols: number[];
     private refillMultipliers: number[];
 
-    constructor(settings: BoardSettings, multiplierConfig: MultiplierConfig, definition: any = null) {
+    constructor(settings: BoardSettings, multiplierConfig: MultiplierConfig, definition: any = null, difficulty: Difficulty) {
         this.definition = definition ?? boardDefinition;
-        this.difficulty = Difficulty.Medium;
+        this.difficulty = difficulty ?? Difficulty.Medium;
         this.settings = settings;
 
         this.multiplierGenerator = new MultiplierGenerator(multiplierConfig.symbol, multiplierConfig.min, multiplierConfig.max);
