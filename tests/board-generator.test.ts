@@ -11,15 +11,25 @@ describe("BoardGenerator", () => {
         jest.clearAllMocks();
 
         const definition = clone(defaultDefinition) as any;
+        const clonedBoardDefinition = clone(boardDefinition);
 
-        boardGenerator = new BoardGenerator(defaultDefinition.boardSettings, defaultDefinition.multiplier, boardDefinition);
+        clonedBoardDefinition.mode[Difficulty.Medium] = {
+            0: 30,
+        } as any;
+
+        boardGenerator = new BoardGenerator(definition.boardSettings, definition.multiplier, clonedBoardDefinition, Difficulty.Medium);
     });
 
     describe("constructor", () => {
         describe("when call without parameter", () => {
             it("should create an instance with default configs", () => {
                 // Act
-                const generator = new BoardGenerator(defaultDefinition.boardSettings, defaultDefinition.multiplier, boardDefinition);
+                const generator = new BoardGenerator(
+                    defaultDefinition.boardSettings,
+                    defaultDefinition.multiplier,
+                    boardDefinition,
+                    Difficulty.Medium
+                );
 
                 // Assert
                 expect(generator).toBeDefined();
@@ -168,8 +178,8 @@ describe("BoardGenerator", () => {
 
         it("return result corresponding with board", () => {
             // Arrange
-            const board = [-1, 8, 8, 2, 2, 1, 8, 8, 4, 3, 1, 10, 8, 8, 10, 2, 1, 5, 3, 9, 9, 5, 6, 4, 9, 5, 7, 8, 1, 2];
-            const expected = [-1, 8, 8, 2, 2, 1, 8, 8, 4, 3, 1, 10, 8, 8, 10, 2, 1, 5, 3, 9, 9, 5, 6, 4, 9, 5, 7, 8, 1, 2];
+            const board = [8, -1, 8, -1, 2, 1, 8, 8, 4, 3, 1, 10, 8, 8, 10, 2, 1, 5, 3, 9, 9, 5, 6, 4, 9, 5, 7, 8, 1, 2];
+            const expected = [-1, -1, 8, 8, 2, 1, 8, 8, 4, 3, 1, 10, 8, 8, 10, 2, 1, 5, 3, 9, 9, 5, 6, 4, 9, 5, 7, 8, 1, 2];
 
             // Act
             const result = boardGenerator.collapse(board);
