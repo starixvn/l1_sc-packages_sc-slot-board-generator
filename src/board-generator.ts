@@ -4,7 +4,6 @@ import {
     complement,
     concat,
     count,
-    equals,
     flatten,
     includes,
     isEmpty,
@@ -19,12 +18,12 @@ import {
     __,
 } from "ramda";
 
-import defaultDefinition from "./default-definition";
 import boardDefinition from "./board-definition";
 import { Difficulty } from "./difficulties";
 import MultiplierGenerator from "./multiplier-generator";
 import SymbolsGenerator from "./symbols-generator";
 import { replace, replaceEach } from "./utils";
+import { isMultiplierSymbol, isNoSymbol, isSpecialSymbol, NO_SYMBOL, SPECIAL_SYMBOL } from "./board-helper";
 
 export interface IBoard {
     newBoard: number[];
@@ -47,8 +46,6 @@ export interface MultiplierConfig {
 }
 
 export class BoardGenerator {
-    public readonly NoSymbol: number = -1;
-    public readonly SpecialSymbol: number = -2;
     private readonly settings: BoardSettings;
     private readonly definition: any;
     private readonly multiplierGenerator: MultiplierGenerator;
@@ -90,36 +87,23 @@ export class BoardGenerator {
 
     explodeAndRefill(board: number[], winSymbols: number[], oldMultipliers: number[]): IBoard {
         const isWinningSymbol = includes(__, winSymbols);
-        const isNoSymbol = equals(this.NoSymbol);
-        const isSpecialSymbol = equals(this.SpecialSymbol);
 
-        const numberOfSymbols = count(isWinningSymbol, board);
-        const newSymbols = this.getRefillSymbols(numberOfSymbols);
+        const numberOfNewSymbols = count(isWinningSymbol, board);
+        const newSymbols = this.getRefillSymbols(numberOfNewSymbols);
 
-        const exploded = replace(complement(isWinningSymbol), this.NoSymbol, board);
-        const remained = replace(isWinningSymbol, this.NoSymbol, board);
+        const exploded = replace(complement(isWinningSymbol), NO_SYMBOL, board);
+        const remained = replace(isWinningSymbol, NO_SYMBOL, board);
         const collapsed = this.collapse(remained);
-        const filled = pipe(
-            replace(complement(isNoSymbol), this.SpecialSymbol),
-            replaceEach(isNoSymbol, newSymbols),
-            replace(isSpecialSymbol, this.NoSymbol)
-        )(collapsed);
 
-        const oldMultiplierValueBoard = this.convertToMultiplierValueBoard(collapsed, oldMultipliers);
-
-        const newMultipliers = this.getMultiplierValues(newSymbols, oldMultipliers);
-        const newMultiplierValueBoard = this.convertToMultiplierValueBoard(newSymbols, newMultipliers);
-
-        const mergedMultiplierValueBoard = replaceEach(isNoSymbol, newMultiplierValueBoard, oldMultiplierValueBoard);
-        const multipliers = reject(isSpecialSymbol, mergedMultiplierValueBoard);
-
+        const filled = this.arrangeRefilledSymbols(collapsed, newSymbols);
+        const multipliers = this.arrangeMultiplierSymbols(collapsed, newSymbols, oldMultipliers);
         const newBoard = replaceEach(isNoSymbol, newSymbols, collapsed);
 
         return {
             newBoard: newBoard,
             explodedSymbols: exploded,
-            newSymbols: filled as any as number[],
-            multipliers: multipliers as number[],
+            newSymbols: filled,
+            multipliers: multipliers,
         };
     }
 
@@ -129,26 +113,59 @@ export class BoardGenerator {
 
     collapse(board: number[]): number[] {
         const symbolsOnReel = this.settings.symbolsOnReel;
-        const emptyReel = repeat(this.NoSymbol, symbolsOnReel);
 
         const getReels = splitEvery(symbolsOnReel);
-        const removeNoSymbolInList = reject(equals(this.NoSymbol)) as (a: any[]) => any;
-        const prependNoSymbolToList = concat(emptyReel) as (a: any[]) => any;
-        const splitSymbols = (list: number[]) => splitAt(list.length - symbolsOnReel, list);
-        const collapseReel = pipe(removeNoSymbolInList, prependNoSymbolToList, splitSymbols, last);
-        const collapseBoard = pipe(getReels, map(collapseReel), flatten) as <T>(a: T[]) => T[];
+        const collapseReel = (reel: number[]) => this.collapseReel(reel);
+        const collapseBoard = pipe<number[][], number[][], number[][], number[]>(getReels, map(collapseReel), flatten);
 
         return collapseBoard(board);
     }
 
-    convertToMultiplierValueBoard(board: number[], multiplierValues: number[]): number[] {
-        const isMultiplierSymbol = equals(defaultDefinition.multiplier.symbol);
-        const isNoSymbol = equals(this.NoSymbol);
+    protected arrangeRefilledSymbols(collapsed: number[], newSymbols: number[]) {
+        const replaceNormalSymbolBySpecialOne = replace(complement(isNoSymbol), SPECIAL_SYMBOL);
+        const filled = pipe<number[][], number[], number[], number[]>(
+            replaceNormalSymbolBySpecialOne,
+            replaceEach(isNoSymbol, newSymbols),
+            replace(isSpecialSymbol, NO_SYMBOL)
+        );
 
-        return pipe(
-            replace(both(complement(isMultiplierSymbol), complement(isNoSymbol)), this.SpecialSymbol),
-            replaceEach(isMultiplierSymbol, multiplierValues)
-        )(board) as any as number[];
+        return filled(collapsed);
+    }
+
+    protected arrangeMultiplierSymbols(collapsed: number[], newSymbols: number[], oldMultiplierValues: number[]) {
+        const newMultiplierValues = this.getMultiplierValues(newSymbols, oldMultiplierValues);
+
+        const oldMultiplierValueBoard = this.arrangeMultiplierValueToBoard(collapsed, oldMultiplierValues);
+        const newMultiplierValueBoard = this.arrangeMultiplierValueToBoard(newSymbols, newMultiplierValues);
+
+        const mergedMultiplierValueBoard = replaceEach(isNoSymbol, newMultiplierValueBoard, oldMultiplierValueBoard);
+
+        return reject(isSpecialSymbol, mergedMultiplierValueBoard);
+    }
+
+    protected collapseReel(reel: number[]): number[] {
+        const symbolsOnReel = this.settings.symbolsOnReel;
+        const emptyReel = repeat(NO_SYMBOL, symbolsOnReel);
+
+        const removeNoSymbolInList = reject<number>(isNoSymbol);
+        const prependNoSymbolToList = concat<number[]>(emptyReel);
+        const splitSymbols = (list: number[]) => splitAt(list.length - symbolsOnReel, list);
+
+        const collapseReel = pipe<number[][], number[], number[], number[][], number[]>(
+            removeNoSymbolInList,
+            prependNoSymbolToList,
+            splitSymbols,
+            last
+        );
+
+        return collapseReel(reel);
+    }
+
+    arrangeMultiplierValueToBoard(board: number[], multiplierValues: number[]): number[] {
+        const isNotMultiplierSymbolAndNoSymbol = both(complement(isMultiplierSymbol), complement(isNoSymbol));
+        const replaceBySpecialSymbol = replace(isNotMultiplierSymbolAndNoSymbol, SPECIAL_SYMBOL);
+
+        return pipe<number[][], number[], number[]>(replaceBySpecialSymbol, replaceEach(isMultiplierSymbol, multiplierValues))(board);
     }
 
     setRefillSymbols(symbols: number[], multipliers: number[]) {

@@ -3,6 +3,7 @@ import { BoardGenerator } from "../src/board-generator";
 import defaultDefinition from "../src/default-definition";
 import boardDefinition from "../src/board-definition";
 import { Difficulty } from "../src/difficulties";
+import { NO_SYMBOL } from "../src/board-helper";
 
 describe("BoardGenerator", () => {
     let boardGenerator: BoardGenerator;
@@ -87,7 +88,7 @@ describe("BoardGenerator", () => {
             const result = boardGenerator.explodeAndRefill(board.newBoard, [2], []);
 
             // Assert
-            expect(result.newBoard.indexOf(boardGenerator.NoSymbol) === -1).toBe(true);
+            expect(result.newBoard.indexOf(NO_SYMBOL) === -1).toBe(true);
         });
 
         it("return exploded symbols corresponding with board", () => {

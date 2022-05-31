@@ -4,9 +4,14 @@ export function shuffleN<T>(shuffle: (a: T[]) => T[], times: number, input: T[])
     return reduce((result, fn: (a: T[]) => T[]) => fn(result), input, repeat(shuffle, times));
 }
 
-export const replace = curry((truly: (a: any) => boolean, replacement: any, input: any[]) => {
+type ReplaceFullType = <T>(truly: (a: T) => boolean, replacement: T, input: T[]) => T[];
+type ReplaceHigherOrderType = <T>(truly: (a: T) => boolean, replacement: T) => (input: T[]) => T[];
+
+function replaceInternal<T>(truly: (a: any) => boolean, replacement: any, input: any[]) {
     return reduce((result, element) => append(truly(element) ? replacement : element, result), [] as any[], input);
-});
+}
+
+export const replace = curry(replaceInternal);
 
 export const replaceEach = curry((truly: (a: any) => boolean, replacements: any[], input: any[]) => {
     const result = clone(input);
