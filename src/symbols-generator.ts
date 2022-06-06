@@ -34,10 +34,6 @@ export default class SymbolsGenerator {
         this.board = shuffleN(this.chance.shuffle.bind(this.chance), numberOfShuffles, board);
     }
 
-    randomSymbol(): number {
-        return this.chance.pickone(this.board);
-    }
-
     randomSymbols(size: number): number[] {
         return this.chance.pickset(this.board, size);
     }

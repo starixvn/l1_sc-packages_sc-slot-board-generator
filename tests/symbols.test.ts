@@ -22,19 +22,6 @@ describe("Symbols", () => {
         });
     });
 
-    describe("getSymbol", () => {
-        it("return one symbol", () => {
-            // Arrange
-            const symbols = new SymbolsGenerator(numberOfSymbols);
-
-            // Act
-            const randomSymbol = symbols.randomSymbol();
-
-            // Assert
-            expect(randomSymbol).toBeGreaterThan(-1);
-        });
-    });
-
     describe("getSymbols", () => {
         it("return set of symbols", () => {
             // Arrange
