@@ -17,11 +17,11 @@ export default class MultiplierGenerator {
     }
 
     randomValue(multipliers: number) {
-        const maximumValue = max(Math.round(this.max / ((multipliers >> 0) + this.min)), this.min);
+        const maximumValue = max(Math.round(this.max / max(multipliers, 1)), this.min);
         const values = range(this.min, maximumValue).flatMap((value) => repeat(value, maximumValue - value + this.min));
         const value = this.chance.pickone(values);
 
-        return Math.max(value, 2);
+        return Math.max(value, this.min);
     }
 
     generate(board: number[], oldMultipliers: number[] = []): number[] {
