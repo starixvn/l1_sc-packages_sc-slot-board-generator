@@ -60,7 +60,7 @@ export class BoardGenerator {
         this.difficulty = difficulty ?? Difficulty.Medium;
         this.settings = settings;
 
-        this.multiplierGenerator = new MultiplierGenerator(multiplierConfig.symbol, multiplierConfig.min, multiplierConfig.max);
+        this.multiplierGenerator = new MultiplierGenerator(multiplierConfig.min, multiplierConfig.max);
     }
 
     setDifficulty(difficulty: Difficulty): void {
@@ -166,7 +166,7 @@ export class BoardGenerator {
 
     getMultiplierValues(board: number[], oldMultipliers: number[]) {
         if (isNil(this.refillMultipliers) || isEmpty(this.refillMultipliers)) {
-            return this.multiplierGenerator.generate(board, oldMultipliers);
+            return this.multiplierGenerator.generate(board, oldMultipliers.length);
         } else {
             const multipliers = clone(this.refillMultipliers);
 
