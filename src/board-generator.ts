@@ -144,19 +144,10 @@ export class BoardGenerator {
     }
 
     protected collapseReel(reel: number[]): number[] {
-        const symbolsOnReel = this.settings.symbolsOnReel;
-        const emptyReel = repeat(NO_SYMBOL, symbolsOnReel);
-
         const removeNoSymbolInList = reject<number>(isNoSymbol);
-        const prependNoSymbolToList = concat<number[]>(emptyReel);
-        const splitSymbols = (list: number[]) => splitAt(list.length - symbolsOnReel, list);
-
-        const collapseReel = pipe<number[][], number[], number[], number[][], number[]>(
-            removeNoSymbolInList,
-            prependNoSymbolToList,
-            splitSymbols,
-            last
-        );
+        const fillNoSymbols = (list: number[]) => repeat(NO_SYMBOL, this.settings.symbolsOnReel - list.length);
+        const prependNoSymbolToList = (list: number[]) => concat(fillNoSymbols(list), list);
+        const collapseReel = pipe(removeNoSymbolInList, prependNoSymbolToList);
 
         return collapseReel(reel);
     }
