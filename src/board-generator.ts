@@ -1,22 +1,4 @@
-import {
-    both,
-    clone,
-    complement,
-    concat,
-    count,
-    flatten,
-    includes,
-    isEmpty,
-    isNil,
-    last,
-    map,
-    pipe,
-    reject,
-    repeat,
-    splitAt,
-    splitEvery,
-    __,
-} from "ramda";
+import { both, clone, complement, concat, count, flatten, includes, isEmpty, isNil, map, pipe, reject, repeat, splitEvery, __ } from "ramda";
 
 import boardDefinition from "./board-definition";
 import { Difficulty } from "./difficulties";

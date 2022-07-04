@@ -30,7 +30,7 @@ export default class MultiplierGenerator {
         return max(value, this.min);
     }
 
-    generate(board: number[], numberOfMultipliers: number = 0): number[] {
+    generate(board: number[], numberOfMultipliers = 0): number[] {
         const getMultiplierSymbols = filter<number>(isMultiplierSymbol);
         const getRandomValue = () => this.randomValue(numberOfMultipliers);
 
