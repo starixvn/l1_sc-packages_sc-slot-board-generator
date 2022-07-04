@@ -2,15 +2,17 @@ import { Chance } from "chance";
 import { filter, flatten, map, max, pipe, range, repeat } from "ramda";
 import { isMultiplierSymbol } from "./board-helper";
 
-export default class MultiplierGenerator {
+export interface MultiplierConfig {
+    min: number;
+    max: number;
+}
+
+export class MultiplierGenerator {
     private readonly chance: Chance.Chance;
+    private readonly config: MultiplierConfig;
 
-    private min: number;
-    private max: number;
-
-    constructor(min: number, max: number) {
-        this.min = min;
-        this.max = max;
+    constructor(config: MultiplierConfig) {
+        this.config = config;
 
         this.chance = new Chance();
     }
@@ -23,11 +25,11 @@ export default class MultiplierGenerator {
     }
 
     randomValue(multipliers: number) {
-        const maximumValue = max(Math.round(this.max / max(multipliers, 1)), this.min);
-        const values = this.generateSetOfValues(this.min, maximumValue);
+        const maximumValue = max(Math.round(this.config.max / max(multipliers, 1)), this.config.min);
+        const values = this.generateSetOfValues(this.config.min, maximumValue);
         const value = this.chance.pickone(values);
 
-        return max(value, this.min);
+        return max(value, this.config.min);
     }
 
     generate(board: number[], numberOfMultipliers = 0): number[] {
@@ -38,7 +40,11 @@ export default class MultiplierGenerator {
     }
 
     update(min: number, max: number) {
-        this.min = min;
-        this.max = max;
+        this.config.min = min;
+        this.config.max = max;
+    }
+
+    getConfig(): MultiplierConfig {
+        return this.config;
     }
 }

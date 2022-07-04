@@ -2,7 +2,7 @@ import { both, clone, complement, concat, count, flatten, includes, isEmpty, isN
 
 import boardDefinition from "./board-definition";
 import { Difficulty } from "./difficulties";
-import MultiplierGenerator from "./multiplier-generator";
+import { MultiplierGenerator, MultiplierConfig } from "./multiplier-generator";
 import SymbolsGenerator from "./symbols-generator";
 import { replace, replaceEach } from "./utils";
 import { isMultiplierSymbol, isNoSymbol, isSpecialSymbol, NO_SYMBOL, SPECIAL_SYMBOL } from "./board-helper";
@@ -21,12 +21,6 @@ export interface BoardSettings {
     numberOfShuffles: number;
 }
 
-export interface MultiplierConfig {
-    symbol: number;
-    min: number;
-    max: number;
-}
-
 export class BoardGenerator {
     private readonly settings: BoardSettings;
     private readonly definition: any;
@@ -42,7 +36,7 @@ export class BoardGenerator {
         this.difficulty = difficulty ?? Difficulty.Medium;
         this.settings = settings;
 
-        this.multiplierGenerator = new MultiplierGenerator(multiplierConfig.min, multiplierConfig.max);
+        this.multiplierGenerator = new MultiplierGenerator(multiplierConfig);
     }
 
     setDifficulty(difficulty: Difficulty): void {

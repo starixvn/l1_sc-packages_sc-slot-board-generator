@@ -1,5 +1,4 @@
-import { range, when } from "ramda";
-import MultiplierGenerator from "../src/multiplier-generator";
+import { MultiplierGenerator } from "../src/multiplier-generator";
 
 const pickOne = jest.fn();
 
@@ -9,7 +8,7 @@ describe("MultiplierGenerator", () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        multiplierGenerator = new MultiplierGenerator(2, 21);
+        multiplierGenerator = new MultiplierGenerator({ min: 2, max: 21 });
 
         (multiplierGenerator as any)["chance"] = {
             pickone: pickOne,
@@ -78,7 +77,7 @@ describe("MultiplierGenerator", () => {
                 multiplierGenerator.update(3, 10);
 
                 // Assert
-                expect(multiplierGenerator["min"]).toBe(3);
+                expect(multiplierGenerator.getConfig().min).toBe(3);
             });
 
             it("the max property should be updated", () => {
@@ -86,8 +85,26 @@ describe("MultiplierGenerator", () => {
                 multiplierGenerator.update(3, 10);
 
                 // Assert
-                expect(multiplierGenerator["max"]).toBe(10);
+                expect(multiplierGenerator.getConfig().max).toBe(10);
             });
+        });
+    });
+
+    describe("getConfig", () => {
+        it("should return current min value", () => {
+            // Act
+            const result = multiplierGenerator.getConfig();
+
+            // Assert
+            expect(result.min).toBe(2);
+        });
+
+        it("should return current max value", () => {
+            // Act
+            const result = multiplierGenerator.getConfig();
+
+            // Assert
+            expect(result.max).toBe(21);
         });
     });
 });
