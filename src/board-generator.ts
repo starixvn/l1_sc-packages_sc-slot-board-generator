@@ -51,6 +51,10 @@ export class BoardGenerator {
         this.multiplierGenerator.update(min, max);
     }
 
+    getMultiplierConfig(): MultiplierConfig {
+        return this.multiplierGenerator.getConfig();
+    }
+
     generate(): IBoard {
         const generator = this.getSymbolGenerator();
         const board = generator.randomSymbols(this.settings.reels * this.settings.symbolsOnReel);

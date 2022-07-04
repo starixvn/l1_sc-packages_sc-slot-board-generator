@@ -58,6 +58,33 @@ describe("BoardGenerator", () => {
         });
     });
 
+    describe("getMultiplierConfig", () => {
+        it("should return current multiplier config", () => {
+            // Arrange
+            const expected = { min: defaultDefinition.multiplier.min, max: defaultDefinition.multiplier.max };
+
+            // Act
+            const result = boardGenerator.getMultiplierConfig();
+
+            // Assert
+            expect(result).toStrictEqual(defaultDefinition.multiplier);
+        });
+    });
+
+    describe("updateMultiplierConfig", () => {
+        it("should return current new multiplier config", () => {
+            // Arrange
+            const expected = { min: 3, max: 40, symbol: defaultDefinition.multiplier.symbol };
+
+            // Act
+            boardGenerator.updateMultiplierConfig(expected.min, expected.max);
+
+            // Assert
+            const result = boardGenerator.getMultiplierConfig();
+            expect(result).toStrictEqual(expected);
+        });
+    });
+
     describe("generate", () => {
         it("return total symbols as defined", () => {
             // Act
