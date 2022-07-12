@@ -1,5 +1,6 @@
 module.exports = async () => {
     return {
+        preset: "ts-jest",
         rootDir: "./",
         verbose: true,
         transform: {
@@ -8,5 +9,6 @@ module.exports = async () => {
         testEnvironment: "node",
         testResultsProcessor: "jest-sonar-reporter",
         setupFilesAfterEnv: ["jest-extended"],
+        coverageReporters: ["clover", "lcov", "text-summary", "cobertura", "text"],
     };
 };

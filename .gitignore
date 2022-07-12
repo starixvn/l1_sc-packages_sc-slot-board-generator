@@ -5,3 +5,8 @@
 
 **/coverage
 **/reports
+
+lib/
+.vscode
+*.cts
+*.map
