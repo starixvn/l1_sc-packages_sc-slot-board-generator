@@ -1,6 +1,5 @@
-import { Chance } from "chance";
 import { concat, reduce, repeat } from "ramda";
-import { shuffleN } from "./utils";
+import { shuffleN, secureShuffle, securePickSet } from "./utils";
 
 export interface SymbolPayout {
     from: number;
@@ -17,12 +16,10 @@ export default class SymbolsGenerator {
     public static readonly DefaultNormalSymbols: number = 1000;
     public static readonly TotalItemPerReel: number = 200;
 
-    private readonly chance: Chance.Chance;
     private readonly board: number[] = [];
     private readonly numberOfSymbols: Record<number, number>;
 
     constructor(numberOfSymbols: Record<number, number>, numberOfShuffles = 3) {
-        this.chance = new Chance();
         this.numberOfSymbols = numberOfSymbols;
 
         const board = reduce(
@@ -31,11 +28,11 @@ export default class SymbolsGenerator {
             Object.entries(this.numberOfSymbols)
         );
 
-        this.board = shuffleN(this.chance.shuffle.bind(this.chance), numberOfShuffles, board);
+        this.board = shuffleN(secureShuffle, numberOfShuffles, board);
     }
 
     randomSymbols(size: number): number[] {
-        return this.chance.pickset(this.board, size);
+        return securePickSet(this.board, size);
     }
 
     getBoard(): number[] {

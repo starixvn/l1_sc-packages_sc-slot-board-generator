@@ -1,6 +1,6 @@
-import { Chance } from "chance";
 import { filter, flatten, map, max, pipe, range, repeat } from "ramda";
 import { isMultiplierSymbol } from "./board-helper";
+import { securePickOne } from "./utils";
 
 export interface MultiplierConfig {
     min: number;
@@ -8,13 +8,10 @@ export interface MultiplierConfig {
 }
 
 export class MultiplierGenerator {
-    private readonly chance: Chance.Chance;
     private readonly config: MultiplierConfig;
 
     constructor(config: MultiplierConfig) {
         this.config = config;
-
-        this.chance = new Chance();
     }
 
     protected generateSetOfValues(min: number, max: number): number[] {
@@ -27,7 +24,8 @@ export class MultiplierGenerator {
     randomValue(multipliers: number) {
         const maximumValue = max(Math.round(this.config.max / max(multipliers, 1)), this.config.min);
         const values = this.generateSetOfValues(this.config.min, maximumValue);
-        const value = this.chance.pickone(values);
+
+        const value = securePickOne(values);
 
         return max(value, this.config.min);
     }

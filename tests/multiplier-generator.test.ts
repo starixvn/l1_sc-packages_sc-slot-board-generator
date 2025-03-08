@@ -1,6 +1,12 @@
 import { MultiplierGenerator } from "../src/multiplier-generator";
 
-const pickOne = jest.fn();
+jest.mock("../src/utils", () => ({
+    securePickOne: jest.fn() as jest.Mock,
+}));
+
+import { securePickOne } from "../src/utils";
+
+const mockSecurePickOne = securePickOne as jest.Mock;
 
 describe("MultiplierGenerator", () => {
     let multiplierGenerator: MultiplierGenerator;
@@ -9,10 +15,6 @@ describe("MultiplierGenerator", () => {
         jest.clearAllMocks();
 
         multiplierGenerator = new MultiplierGenerator({ min: 2, max: 21 });
-
-        (multiplierGenerator as any)["chance"] = {
-            pickone: pickOne,
-        };
     });
 
     describe("randomValue", () => {
@@ -25,7 +27,7 @@ describe("MultiplierGenerator", () => {
                 [4, 3],
             ])("should return as expected", (index, expected) => {
                 // Arrange
-                pickOne.mockImplementationOnce((input: number) => input[index]);
+                mockSecurePickOne.mockImplementationOnce((input: number) => input[index]);
 
                 // Act
                 const value = multiplierGenerator.randomValue(7);
@@ -40,7 +42,7 @@ describe("MultiplierGenerator", () => {
         describe("when number of multipliers is 0", () => {
             it("should return as expected", () => {
                 // Arrange
-                pickOne
+                mockSecurePickOne
                     .mockImplementationOnce((input: number) => input[20])
                     .mockImplementationOnce((input: number) => input[21])
                     .mockImplementationOnce((input: number) => input[41]);
@@ -56,7 +58,7 @@ describe("MultiplierGenerator", () => {
         describe("when number of multipliers is 2", () => {
             it("should return as expected", () => {
                 // Arrange
-                pickOne
+                mockSecurePickOne
                     .mockImplementationOnce((input: number) => input[10])
                     .mockImplementationOnce((input: number) => input[11])
                     .mockImplementationOnce((input: number) => input[21]);
