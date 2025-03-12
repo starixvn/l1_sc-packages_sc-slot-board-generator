@@ -8,9 +8,7 @@
         "declarationMap": true,
         "resolveJsonModule": true,
         "moduleResolution": "node",
-        "allowJs": true,
-        "module": "ESNext",
-        "esModuleInterop": true
+        "allowJs": true
     },
     "exclude": ["tests/", "lib/", "node_modules/", "src/statistics/", "coverage/", "reports/"],
     "watchOptions": {
