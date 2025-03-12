@@ -1,6 +1,6 @@
 import { filter, flatten, map, max, pipe, range, repeat } from "ramda";
 import { isMultiplierSymbol } from "./board-helper";
-import { securePickOne } from "./utils";
+import { securePickOne } from "sc-core-rng";
 
 export interface MultiplierConfig {
     min: number;

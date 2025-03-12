@@ -1,10 +1,10 @@
 import { MultiplierGenerator } from "../src/multiplier-generator";
 
-jest.mock("../src/utils", () => ({
+jest.mock("sc-core-rng", () => ({
     securePickOne: jest.fn() as jest.Mock,
 }));
 
-import { securePickOne } from "../src/utils";
+import { securePickOne } from "sc-core-rng";
 
 const mockSecurePickOne = securePickOne as jest.Mock;
 

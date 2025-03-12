@@ -1,4 +1,4 @@
-import { secureShuffle, securePickSet, securePickOne } from "../src/utils";
+import { securePickOne, securePickSet, secureShuffle } from "sc-core-rng";
 
 describe("Random functions integration", () => {
     describe("secureShuffle", () => {
