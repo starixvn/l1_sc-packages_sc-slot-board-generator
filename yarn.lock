@@ -7643,10 +7643,10 @@ saxes@^5.0.1:
   dependencies:
     xmlchars "^2.2.0"
 
-sc-core-rng@^1.0.2:
-  version "1.0.2"
-  resolved "http://npm.lumigame.com/sc-core-rng/-/sc-core-rng-1.0.2.tgz#50eca607bf704e1e3740d7c3b589f03b950d82cf"
-  integrity sha512-A/+UT9tTmLFvj8Eg9AbVIliNOPlVwQ2OYaQ3pbH1S7LFlVcbKTCLeqBG/9O0fZcDLDOO9e8aaJbaeyr4wLymEg==
+sc-core-rng@^1.0.3-beta.0:
+  version "1.0.3-beta.0"
+  resolved "http://npm.lumigame.com/sc-core-rng/-/sc-core-rng-1.0.3-beta.0.tgz#daae7aa3c97f84f0396b9b8b01e1d18fd1b6adf8"
+  integrity sha512-W4iyHxpOj1WNdWc5Jvjg8UA4/C5eiz7qs8+uxgJyBhYtaN5hX6f3U7anXI5DShJmiDnnqRNBGgxFHod1Jb3wpw==
 
 sc-semantic-release@^1.2.0:
   version "1.2.0"
