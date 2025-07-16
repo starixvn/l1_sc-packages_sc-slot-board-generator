@@ -1,5 +1,5 @@
 import { Chance } from "chance";
-import { filter, flatten, map, max, pipe, range, repeat } from "ramda";
+import { filter, flatten, map, max, pipe, range, repeat, take } from "ramda";
 import { isMultiplierSymbol } from "./board-helper";
 
 export interface MultiplierConfig {
@@ -10,6 +10,23 @@ export interface MultiplierConfig {
 export class MultiplierGenerator {
     private readonly chance: Chance.Chance;
     private readonly config: MultiplierConfig;
+    private readonly multiplierWeights = {
+        2: 0.24,
+        3: 0.2,
+        4: 0.15,
+        5: 0.1,
+        6: 0.08,
+        8: 0.06,
+        10: 0.05,
+        12: 0.03,
+        15: 0.02,
+        20: 0.02,
+        25: 0.01,
+        50: 0.005,
+        100: 0.003,
+        250: 0.001,
+        500: 0.0005,
+    };
 
     constructor(config: MultiplierConfig) {
         this.config = config;
@@ -17,26 +34,19 @@ export class MultiplierGenerator {
         this.chance = new Chance();
     }
 
-    protected generateSetOfValues(min: number, max: number): number[] {
-        const repeatValue = (value: number) => repeat(value, max - value + min);
-        const generateSetOfValues = pipe<number[], number[], number[][], number[]>(range, map(repeatValue), flatten);
+    randomValue(): number {
+        const validMultipliers = Object.keys(this.multiplierWeights).filter((key) => +key >= this.config.min && +key <= this.config.max);
 
-        return generateSetOfValues(min, max + 1);
+        return +this.chance.weighted(
+            validMultipliers,
+            validMultipliers.map((key) => this.multiplierWeights[key])
+        );
     }
 
-    randomValue(multipliers: number) {
-        const maximumValue = max(Math.round(this.config.max / max(multipliers, 1)), this.config.min);
-        const values = this.generateSetOfValues(this.config.min, maximumValue);
-        const value = this.chance.pickone(values);
+    generate(board: number[]): number[] {
+        const randomValue = this.randomValue.bind(this);
 
-        return max(value, this.config.min);
-    }
-
-    generate(board: number[], numberOfMultipliers = 0): number[] {
-        const getMultiplierSymbols = filter<number>(isMultiplierSymbol);
-        const getRandomValue = () => this.randomValue(numberOfMultipliers);
-
-        return pipe(getMultiplierSymbols, map(getRandomValue))(board);
+        return map(randomValue, filter<number>(isMultiplierSymbol)(board));
     }
 
     update(min: number, max: number) {

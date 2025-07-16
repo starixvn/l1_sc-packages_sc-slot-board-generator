@@ -18,27 +18,27 @@ export default class SymbolsGenerator {
     public static readonly TotalItemPerReel: number = 200;
 
     private readonly chance: Chance.Chance;
-    private readonly board: number[] = [];
-    private readonly numberOfSymbols: Record<number, number>;
 
-    constructor(numberOfSymbols: Record<number, number>, numberOfShuffles = 3) {
+    private readonly symbolWeights: Record<number, number> = {
+        0: 0.17,
+        1: 0.15,
+        2: 0.147,
+        3: 0.123,
+        4: 0.11,
+        5: 0.09,
+        6: 0.07,
+        7: 0.06,
+        8: 0.05,
+        9: 0.02,
+        10: 0.01,
+    };
+
+    constructor(symbolWeights: Record<number, number>) {
         this.chance = new Chance();
-        this.numberOfSymbols = numberOfSymbols;
-
-        const board = reduce(
-            (result, [key, value]) => concat(result, repeat(Number(key), value)),
-            [] as number[],
-            Object.entries(this.numberOfSymbols)
-        );
-
-        this.board = shuffleN(this.chance.shuffle.bind(this.chance), numberOfShuffles, board);
+        this.symbolWeights = symbolWeights;
     }
 
     randomSymbols(size: number): number[] {
-        return this.chance.pickset(this.board, size);
-    }
-
-    getBoard(): number[] {
-        return this.board;
+        return new Array(size).fill(0).map(() => parseInt(this.chance.weighted(Object.keys(this.symbolWeights), Object.values(this.symbolWeights))));
     }
 }

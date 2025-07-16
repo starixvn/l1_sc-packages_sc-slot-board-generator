@@ -65,7 +65,7 @@ export class BoardGenerator {
         };
     }
 
-    explodeAndRefill(board: number[], winSymbols: number[], oldMultipliers: number[]): IBoard {
+    explodeAndRefill(board: number[], winSymbols: number[]): IBoard {
         const isWinningSymbol = includes(__, winSymbols);
 
         const numberOfNewSymbols = count(isWinningSymbol, board);
@@ -76,7 +76,7 @@ export class BoardGenerator {
         const collapsed = this.collapse(remained);
 
         const filled = this.arrangeRefilledSymbols(collapsed, newSymbols);
-        const multipliers = this.arrangeMultiplierSymbols(collapsed, newSymbols, oldMultipliers);
+        const multipliers = this.arrangeMultiplierSymbols(collapsed, newSymbols);
         const newBoard = replaceEach(isNoSymbol, newSymbols, collapsed);
 
         return {
@@ -88,7 +88,7 @@ export class BoardGenerator {
     }
 
     getSymbolGenerator(): SymbolsGenerator {
-        return new SymbolsGenerator(this.definition.mode[this.difficulty], this.settings.numberOfShuffles);
+        return new SymbolsGenerator(this.definition.mode[this.difficulty]);
     }
 
     collapse(board: number[]): number[] {
@@ -112,10 +112,10 @@ export class BoardGenerator {
         return filled(collapsed);
     }
 
-    protected arrangeMultiplierSymbols(collapsed: number[], newSymbols: number[], oldMultiplierValues: number[]) {
-        const newMultiplierValues = this.getMultiplierValues(newSymbols, oldMultiplierValues);
+    protected arrangeMultiplierSymbols(collapsed: number[], newSymbols: number[]) {
+        const newMultiplierValues = this.getMultiplierValues(newSymbols);
 
-        const oldMultiplierValueBoard = this.arrangeMultiplierValueToBoard(collapsed, oldMultiplierValues);
+        const oldMultiplierValueBoard = this.arrangeMultiplierValueToBoard(collapsed, this.getMultiplierValues(collapsed));
         const newMultiplierValueBoard = this.arrangeMultiplierValueToBoard(newSymbols, newMultiplierValues);
 
         const mergedMultiplierValueBoard = replaceEach(isNoSymbol, newMultiplierValueBoard, oldMultiplierValueBoard);
@@ -144,9 +144,9 @@ export class BoardGenerator {
         !isEmpty(multipliers) && (this.refillMultipliers = multipliers);
     }
 
-    getMultiplierValues(board: number[], oldMultipliers: number[]) {
+    getMultiplierValues(board: number[]) {
         if (isNil(this.refillMultipliers) || isEmpty(this.refillMultipliers)) {
-            return this.multiplierGenerator.generate(board, oldMultipliers.length);
+            return this.multiplierGenerator.generate(board);
         } else {
             const multipliers = clone(this.refillMultipliers);
 
