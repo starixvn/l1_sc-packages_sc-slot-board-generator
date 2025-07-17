@@ -65,7 +65,7 @@ export class BoardGenerator {
         };
     }
 
-    explodeAndRefill(board: number[], winSymbols: number[]): IBoard {
+    explodeAndRefill(board: number[], winSymbols: number[], oldMultipliers: number[]): IBoard {
         const isWinningSymbol = includes(__, winSymbols);
 
         const numberOfNewSymbols = count(isWinningSymbol, board);
@@ -76,7 +76,7 @@ export class BoardGenerator {
         const collapsed = this.collapse(remained);
 
         const filled = this.arrangeRefilledSymbols(collapsed, newSymbols);
-        const multipliers = this.arrangeMultiplierSymbols(collapsed, newSymbols);
+        const multipliers = this.arrangeMultiplierSymbols(collapsed, newSymbols, oldMultipliers);
         const newBoard = replaceEach(isNoSymbol, newSymbols, collapsed);
 
         return {
@@ -112,10 +112,10 @@ export class BoardGenerator {
         return filled(collapsed);
     }
 
-    protected arrangeMultiplierSymbols(collapsed: number[], newSymbols: number[]) {
+    protected arrangeMultiplierSymbols(collapsed: number[], newSymbols: number[], oldMultiplierValues: number[]) {
         const newMultiplierValues = this.getMultiplierValues(newSymbols);
 
-        const oldMultiplierValueBoard = this.arrangeMultiplierValueToBoard(collapsed, this.getMultiplierValues(collapsed));
+        const oldMultiplierValueBoard = this.arrangeMultiplierValueToBoard(collapsed, oldMultiplierValues);
         const newMultiplierValueBoard = this.arrangeMultiplierValueToBoard(newSymbols, newMultiplierValues);
 
         const mergedMultiplierValueBoard = replaceEach(isNoSymbol, newMultiplierValueBoard, oldMultiplierValueBoard);
