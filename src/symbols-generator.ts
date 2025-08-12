@@ -1,6 +1,4 @@
 import { Chance } from "chance";
-import { concat, reduce, repeat } from "ramda";
-import { shuffleN } from "./utils";
 
 export interface SymbolPayout {
     from: number;
