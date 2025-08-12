@@ -1,5 +1,5 @@
 import { Chance } from "chance";
-import { filter, flatten, map, max, pipe, range, repeat, take } from "ramda";
+import { filter, map } from "ramda";
 import { isMultiplierSymbol } from "./board-helper";
 
 export interface MultiplierConfig {
