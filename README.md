@@ -29,6 +29,7 @@ console.log(`Generated ${chain.boards.length} boards with ${chain.rtpResult.actu
 
 - **[Custom Payout Rules Guide](CUSTOM_PAYOUT_RULES_GUIDE.md)** - Complete guide to configuring game mechanics
 - **[Predefined Results Documentation](PREDEFINED_RESULTS.md)** - Working with predefined board sequences
+- **[Predefined Results Generation Script](PREDEFINED_RESULTS_GENERATION.md)** - CLI tool for generating result chains
 - **[Examples](examples/)** - Practical usage examples and configurations
 
 ## Game Mechanics
@@ -117,6 +118,27 @@ const chain = await generatePredefinedChain({
 console.log(`RTP: ${chain.rtpResult.actualRTP}%`);
 console.log(`Total boards: ${chain.boards.length}`);
 console.log(`Generation attempts: ${chain.generationStats.attempts}`);
+```
+
+### CLI Script for Predefined Results
+
+Generate predefined result chains using the command-line script:
+
+```bash
+# Generate default configuration (120 boards, 97% RTP)
+npm run generate
+
+# Generate quick demo (50 boards)
+npm run generate:demo
+
+# Generate multiple configurations
+npm run generate:batch
+
+# Custom configuration
+npm run generate -- --boards 200 --rtp 0.96 --output custom-results.json
+
+# Show all options
+npm run generate:help
 ```
 
 ## Installation

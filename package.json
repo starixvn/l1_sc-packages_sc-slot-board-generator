@@ -12,6 +12,10 @@
         "build:watch": "tsc --watch",
         "test": "jest",
         "test-coverage": "jest --collect-coverage",
+        "generate": "npx ts-node scripts/generate-predefined-results.ts",
+        "generate:batch": "npx ts-node scripts/generate-predefined-results.ts --batch",
+        "generate:demo": "npx ts-node scripts/generate-predefined-results.ts --boards 50 --rtp 0.97 --output demo-results.json --description \"Quick demo with 50 boards\"",
+        "generate:help": "npx ts-node scripts/generate-predefined-results.ts --help",
         "reg": "npm set registry http://npm.lumigame.com",
         "pub": "npm publish --registry http://npm.lumigame.com",
         "betaver": "npm version prerelease --preid beta",
@@ -41,6 +45,7 @@
     "license": "ISC",
     "dependencies": {
         "chance": "^1.1.7",
+        "commander": "^14.0.0",
         "ramda": "^0.28.0"
     },
     "devDependencies": {

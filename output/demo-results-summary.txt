@@ -1,0 +1,29 @@
+# Predefined Results Summary
+Generated: 2025-08-21T10:32:20.241Z
+
+## Configuration
+Board Count: 50
+Target RTP: 97.0%
+Tolerance: ±1.0%
+Max Retries: 10
+Difficulty: Medium
+Rules: Default
+Description: Quick demo with 50 boards
+
+## Results
+Final RTP: 75.069%
+Generation Attempts: 11
+Average Win: 0.751x bet
+Total Boards: 50
+Meets Target: No
+
+## Win Distribution
+Total Bets: 50
+Total Wins: 37.53
+Win Variance: 7.1418
+
+## Board Statistics
+Winning Boards: 5
+Free Spin Triggers: 1
+Max Single Win: 14.69x
+Average Cascade Count: 0.10
