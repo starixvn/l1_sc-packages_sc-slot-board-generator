@@ -1,0 +1,125 @@
+{
+    "version": "1.1",
+    "gameType": "High Volatility Zeus Slots",
+    "description": "High volatility payout rules with rare but massive wins",
+    "symbolPayouts": [
+        {
+            "symbol": 0,
+            "name": "Crown",
+            "type": "premium",
+            "payouts": [
+                { "count": 10, "multiplier": 100, "description": "10-11 symbols (ultra rare, huge payout)" },
+                { "count": 12, "multiplier": 500, "description": "12+ symbols (jackpot level)" }
+            ]
+        },
+        {
+            "symbol": 1,
+            "name": "Hourglass",
+            "type": "high",
+            "payouts": [
+                { "count": 10, "multiplier": 50, "description": "10-11 symbols" },
+                { "count": 12, "multiplier": 200, "description": "12+ symbols" }
+            ]
+        },
+        {
+            "symbol": 2,
+            "name": "Ring",
+            "type": "high",
+            "payouts": [
+                { "count": 10, "multiplier": 30, "description": "10-11 symbols" },
+                { "count": 12, "multiplier": 120, "description": "12+ symbols" }
+            ]
+        },
+        {
+            "symbol": 3,
+            "name": "Goblet",
+            "type": "high",
+            "payouts": [
+                { "count": 10, "multiplier": 25, "description": "10-11 symbols" },
+                { "count": 12, "multiplier": 100, "description": "12+ symbols" }
+            ]
+        },
+        {
+            "symbol": 4,
+            "name": "Red Gem",
+            "type": "medium",
+            "payouts": [
+                { "count": 10, "multiplier": 15, "description": "10-11 symbols" },
+                { "count": 12, "multiplier": 60, "description": "12+ symbols" }
+            ]
+        },
+        {
+            "symbol": 5,
+            "name": "Purple Gem",
+            "type": "medium",
+            "payouts": [
+                { "count": 10, "multiplier": 12, "description": "10-11 symbols" },
+                { "count": 12, "multiplier": 48, "description": "12+ symbols" }
+            ]
+        },
+        {
+            "symbol": 6,
+            "name": "Yellow Gem",
+            "type": "low",
+            "payouts": [
+                { "count": 10, "multiplier": 8, "description": "10-11 symbols" },
+                { "count": 12, "multiplier": 30, "description": "12+ symbols" }
+            ]
+        },
+        {
+            "symbol": 7,
+            "name": "Green Gem",
+            "type": "low",
+            "payouts": [
+                { "count": 10, "multiplier": 5, "description": "10-11 symbols" },
+                { "count": 12, "multiplier": 20, "description": "12+ symbols" }
+            ]
+        },
+        {
+            "symbol": 8,
+            "name": "Blue Gem",
+            "type": "low",
+            "payouts": [
+                { "count": 10, "multiplier": 3, "description": "10-11 symbols" },
+                { "count": 12, "multiplier": 10, "description": "12+ symbols" }
+            ]
+        }
+    ],
+    "specialSymbols": {
+        "zeus": {
+            "symbol": 9,
+            "name": "Zeus Scatter",
+            "type": "scatter",
+            "description": "Triggers mega free spins",
+            "payouts": [
+                { "count": 4, "multiplier": 10, "freeSpins": 20, "description": "4 scatters - mega bonus" },
+                { "count": 5, "multiplier": 50, "freeSpins": 30, "description": "5 scatters - super bonus" },
+                { "count": 6, "multiplier": 1000, "freeSpins": 50, "description": "6+ scatters - jackpot bonus" }
+            ]
+        },
+        "multiplierOrb": {
+            "symbol": 10,
+            "name": "Multiplier Orb",
+            "type": "multiplier",
+            "description": "Massive multiplier potential",
+            "valueRange": {
+                "min": 5,
+                "max": 100
+            }
+        }
+    },
+    "gameRules": {
+        "minSymbolWinCount": 10,
+        "description": "High volatility - requires 10+ symbols for wins, but massive payouts",
+        "winDetection": "count-based",
+        "cascading": true,
+        "freeSpins": {
+            "triggeredBy": "zeus",
+            "retriggerRules": {
+                "count": 3,
+                "additionalSpins": 15,
+                "description": "3+ Zeus during free spins awards 15 more spins"
+            }
+        }
+    }
+}
