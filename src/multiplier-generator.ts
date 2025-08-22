@@ -1,6 +1,7 @@
 import { Chance } from "chance";
 import { filter, map } from "ramda";
 import { isMultiplierSymbol } from "./board-helper";
+import { Volatility } from "./volatility";
 
 export interface MultiplierConfig {
     min: number;
@@ -28,9 +29,9 @@ export class MultiplierGenerator {
         500: 0.0005,
     };
 
-    constructor(config: MultiplierConfig) {
+    constructor(config: MultiplierConfig, definition: any, volatility: Volatility) {
         this.config = config;
-
+        this.multiplierWeights = definition[volatility].multiplierWeights;
         this.chance = new Chance();
     }
 

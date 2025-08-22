@@ -38,7 +38,7 @@ export class BoardGenerator {
         this.difficulty = difficulty ?? Difficulty.Medium;
         this.settings = settings;
 
-        this.multiplierGenerator = new MultiplierGenerator(multiplierConfig);
+        this.multiplierGenerator = new MultiplierGenerator(multiplierConfig, definition, this.volatility);
     }
 
     setDifficulty(difficulty: Difficulty): void {
