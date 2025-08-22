@@ -6,6 +6,7 @@ import { MultiplierGenerator, MultiplierConfig } from "./multiplier-generator";
 import SymbolsGenerator from "./symbols-generator";
 import { replace, replaceEach } from "./utils";
 import { isMultiplierSymbol, isNoSymbol, isSpecialSymbol, NO_SYMBOL, SPECIAL_SYMBOL } from "./board-helper";
+import { Volatility } from "./volatility";
 
 export interface IBoard {
     newBoard: number[];
@@ -27,12 +28,13 @@ export class BoardGenerator {
     private readonly multiplierGenerator: MultiplierGenerator;
 
     private difficulty: Difficulty;
-
+    private volatility: Volatility;
     private refillSymbols: number[];
     private refillMultipliers: number[];
 
-    constructor(settings: BoardSettings, multiplierConfig: MultiplierConfig, definition: any = null, difficulty: Difficulty) {
+    constructor(settings: BoardSettings, multiplierConfig: MultiplierConfig, definition: any = null, difficulty: Difficulty, volatility: Volatility) {
         this.definition = definition ?? boardDefinition;
+        this.volatility = volatility && boardDefinition[volatility] ? volatility : Volatility.MediumLow;
         this.difficulty = difficulty ?? Difficulty.Medium;
         this.settings = settings;
 
@@ -88,7 +90,7 @@ export class BoardGenerator {
     }
 
     getSymbolGenerator(): SymbolsGenerator {
-        return new SymbolsGenerator(this.definition.mode[this.difficulty]);
+        return new SymbolsGenerator(this.definition[this.volatility].mode[this.difficulty]);
     }
 
     collapse(board: number[]): number[] {
