@@ -175,29 +175,6 @@ describe("BoardGenerator", () => {
         });
     });
 
-    describe("getDifficulty", () => {
-        it("should return value as expected", () => {
-            // Arrange
-            boardGenerator.setDifficulty(Difficulty.Medium);
-
-            // Act
-            const actual = boardGenerator.getDifficulty();
-
-            // Assert
-            expect(actual).toBe(Difficulty.Medium);
-        });
-    });
-
-    describe("setDifficulty", () => {
-        it("should change the difficulty of this board", () => {
-            // Act
-            boardGenerator.setDifficulty(Difficulty.Easy);
-
-            // Assert
-            expect(boardGenerator.getDifficulty()).toBe(Difficulty.Easy);
-        });
-    });
-
     describe("getMultiplierConfig", () => {
         it("should return current multiplier config", () => {
             // Arrange

@@ -26,12 +26,11 @@ export class BoardGenerator {
     private readonly settings: BoardSettings;
     private readonly definition: any;
     private readonly multiplierGenerator: MultiplierGenerator;
+    private readonly isFreeSpin: boolean;
+    private readonly volatility: Volatility;
 
-    private difficulty: Difficulty;
-    private volatility: Volatility;
     private refillSymbols: number[];
     private refillMultipliers: number[];
-    private isFreeSpin: boolean;
 
     constructor(
         settings: BoardSettings,
@@ -46,14 +45,6 @@ export class BoardGenerator {
 
         this.multiplierGenerator = new MultiplierGenerator(multiplierConfig, definition, this.volatility, isFreeSpin);
         this.isFreeSpin = isFreeSpin;
-    }
-
-    setDifficulty(difficulty: Difficulty): void {
-        this.difficulty = difficulty;
-    }
-
-    getDifficulty(): Difficulty {
-        return this.difficulty;
     }
 
     updateMultiplierConfig(min: number, max: number): void {
