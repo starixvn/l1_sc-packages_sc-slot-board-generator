@@ -1,7 +1,6 @@
 import { both, clone, complement, concat, count, flatten, includes, isEmpty, isNil, map, pipe, reject, repeat, splitEvery, __ } from "ramda";
 
 import boardDefinition from "./board-definition";
-import { Difficulty } from "./difficulties";
 import { MultiplierGenerator, MultiplierConfig } from "./multiplier-generator";
 import SymbolsGenerator from "./symbols-generator";
 import { replace, replaceEach } from "./utils";
@@ -32,13 +31,7 @@ export class BoardGenerator {
     private refillSymbols: number[];
     private refillMultipliers: number[];
 
-    constructor(
-        settings: BoardSettings,
-        multiplierConfig: MultiplierConfig,
-        definition: any = null,
-        volatility: Volatility,
-        isFreeSpin: boolean = false
-    ) {
+    constructor(settings: BoardSettings, multiplierConfig: MultiplierConfig, definition: any = null, volatility: Volatility, isFreeSpin = false) {
         this.definition = definition ?? boardDefinition;
         this.volatility = volatility && boardDefinition[volatility] ? volatility : Volatility.MediumLow;
         this.settings = settings;
