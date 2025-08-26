@@ -31,14 +31,21 @@ export class BoardGenerator {
     private volatility: Volatility;
     private refillSymbols: number[];
     private refillMultipliers: number[];
+    private isFreeSpin: boolean;
 
-    constructor(settings: BoardSettings, multiplierConfig: MultiplierConfig, definition: any = null, difficulty: Difficulty, volatility: Volatility) {
+    constructor(
+        settings: BoardSettings,
+        multiplierConfig: MultiplierConfig,
+        definition: any = null,
+        volatility: Volatility,
+        isFreeSpin: boolean = false
+    ) {
         this.definition = definition ?? boardDefinition;
         this.volatility = volatility && boardDefinition[volatility] ? volatility : Volatility.MediumLow;
-        this.difficulty = difficulty ?? Difficulty.Medium;
         this.settings = settings;
 
-        this.multiplierGenerator = new MultiplierGenerator(multiplierConfig, definition, this.volatility);
+        this.multiplierGenerator = new MultiplierGenerator(multiplierConfig, definition, this.volatility, isFreeSpin);
+        this.isFreeSpin = isFreeSpin;
     }
 
     setDifficulty(difficulty: Difficulty): void {
@@ -90,7 +97,9 @@ export class BoardGenerator {
     }
 
     getSymbolGenerator(): SymbolsGenerator {
-        return new SymbolsGenerator(this.definition[this.volatility].mode[this.difficulty]);
+        const mode = this.isFreeSpin ? this.definition[this.volatility].freeSpin : this.definition[this.volatility].normalSpin;
+
+        return new SymbolsGenerator(mode.symbolWeights);
     }
 
     collapse(board: number[]): number[] {

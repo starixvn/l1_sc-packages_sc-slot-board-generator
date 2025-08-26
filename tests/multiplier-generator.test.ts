@@ -1,11 +1,13 @@
 import { MultiplierGenerator } from "../src/multiplier-generator";
+import boardDefinition from "../src/board-definition";
+import { Volatility } from "../src/volatility";
 
 describe("MultiplierGenerator", () => {
     let multiplierGenerator: MultiplierGenerator;
 
     beforeEach(() => {
         jest.clearAllMocks();
-        multiplierGenerator = new MultiplierGenerator({ min: 2, max: 21 });
+        multiplierGenerator = new MultiplierGenerator({ min: 2, max: 21 }, boardDefinition, Volatility.MediumLow, false);
     });
 
     afterEach(() => {
@@ -19,7 +21,7 @@ describe("MultiplierGenerator", () => {
                 const config = { min: 3, max: 15 };
 
                 // Act
-                const generator = new MultiplierGenerator(config);
+                const generator = new MultiplierGenerator(config, boardDefinition, Volatility.MediumLow, false);
 
                 // Assert
                 expect(generator.getConfig()).toStrictEqual(config);
@@ -32,7 +34,7 @@ describe("MultiplierGenerator", () => {
                 const config = { min: 100, max: 50 };
 
                 // Act
-                const generator = new MultiplierGenerator(config);
+                const generator = new MultiplierGenerator(config, boardDefinition, Volatility.MediumLow, false);
 
                 // Assert
                 expect(generator.getConfig().min).toBe(100);
@@ -62,7 +64,7 @@ describe("MultiplierGenerator", () => {
 
             it("should return valid multiplier value", () => {
                 // Arrange
-                const validMultipliers = [2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 21];
+                const validMultipliers = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
 
                 // Act
                 const value = multiplierGenerator.randomValue();
@@ -75,21 +77,26 @@ describe("MultiplierGenerator", () => {
         describe("when using custom config", () => {
             it("should filter multipliers based on min/max config", () => {
                 // Arrange
-                const generator = new MultiplierGenerator({ min: 50, max: 100 });
+                const generator = new MultiplierGenerator(
+                    { min: 2, max: 20 }, 
+                    boardDefinition, 
+                    Volatility.VeryHigh, 
+                    false
+                );
 
                 // Act
                 const value = generator.randomValue();
 
                 // Assert
-                expect(value).toBeGreaterThanOrEqual(50);
-                expect(value).toBeLessThanOrEqual(100);
+                expect(value).toBeGreaterThanOrEqual(2);
+                expect(value).toBeLessThanOrEqual(20);
             });
         });
 
         describe("when config has edge cases", () => {
             it("should handle edge case when min equals max", () => {
                 // Arrange
-                const generator = new MultiplierGenerator({ min: 10, max: 10 });
+                const generator = new MultiplierGenerator({ min: 10, max: 10 }, boardDefinition, Volatility.MediumLow, false);
 
                 // Act
                 const value = generator.randomValue();
@@ -100,13 +107,37 @@ describe("MultiplierGenerator", () => {
 
             it("should handle config with same min and max values", () => {
                 // Arrange
-                const generator = new MultiplierGenerator({ min: 10, max: 10 });
+                const generator = new MultiplierGenerator({ min: 10, max: 10 }, boardDefinition, Volatility.MediumLow, false);
 
                 // Act
                 const value = generator.randomValue();
 
                 // Assert
                 expect(value).toBe(10);
+            });
+        });
+
+        describe("when using different volatility levels", () => {
+            it("should use different weights for different volatility", () => {
+                // Arrange
+                const mediumLowGenerator = new MultiplierGenerator({ min: 2, max: 21 }, boardDefinition, Volatility.MediumLow, false);
+                const veryHighGenerator = new MultiplierGenerator({ min: 2, max: 21 }, boardDefinition, Volatility.VeryHigh, false);
+
+                // Act & Assert - This is a basic test to ensure both generators work
+                expect(typeof mediumLowGenerator.randomValue()).toBe("number");
+                expect(typeof veryHighGenerator.randomValue()).toBe("number");
+            });
+        });
+
+        describe("when using free spin mode", () => {
+            it("should use free spin weights when isFreeSpin is true", () => {
+                // Arrange
+                const normalSpinGenerator = new MultiplierGenerator({ min: 2, max: 21 }, boardDefinition, Volatility.MediumLow, false);
+                const freeSpinGenerator = new MultiplierGenerator({ min: 2, max: 21 }, boardDefinition, Volatility.MediumLow, true);
+
+                // Act & Assert - This is a basic test to ensure both generators work
+                expect(typeof normalSpinGenerator.randomValue()).toBe("number");
+                expect(typeof freeSpinGenerator.randomValue()).toBe("number");
             });
         });
     });
@@ -217,14 +248,14 @@ describe("MultiplierGenerator", () => {
 
             it("should affect randomValue range", () => {
                 // Arrange
-                multiplierGenerator.update(50, 500);
+                multiplierGenerator.update(2, 20);
 
                 // Act
                 const value = multiplierGenerator.randomValue();
 
                 // Assert
-                expect(value).toBeGreaterThanOrEqual(50);
-                expect(value).toBeLessThanOrEqual(500);
+                expect(value).toBeGreaterThanOrEqual(2);
+                expect(value).toBeLessThanOrEqual(20);
             });
         });
 

@@ -11,27 +11,11 @@ export interface MultiplierConfig {
 export class MultiplierGenerator {
     private readonly chance: Chance.Chance;
     private readonly config: MultiplierConfig;
-    private readonly multiplierWeights = {
-        2: 0.24,
-        3: 0.2,
-        4: 0.15,
-        5: 0.1,
-        6: 0.08,
-        8: 0.06,
-        10: 0.05,
-        12: 0.03,
-        15: 0.02,
-        20: 0.02,
-        25: 0.01,
-        50: 0.005,
-        100: 0.003,
-        250: 0.001,
-        500: 0.0005,
-    };
+    private readonly multiplierWeights = {};
 
-    constructor(config: MultiplierConfig, definition: any, volatility: Volatility) {
+    constructor(config: MultiplierConfig, definition: any, volatility: Volatility, isFreeSpin: boolean) {
         this.config = config;
-        this.multiplierWeights = definition[volatility].multiplierWeights;
+        this.multiplierWeights = isFreeSpin ? definition[volatility].freeSpin.multiplierWeights : definition[volatility].normalSpin.multiplierWeights;
         this.chance = new Chance();
     }
 
