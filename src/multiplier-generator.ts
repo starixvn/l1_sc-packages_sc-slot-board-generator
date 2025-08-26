@@ -2,6 +2,7 @@ import { Chance } from "chance";
 import { filter, map } from "ramda";
 import { isMultiplierSymbol } from "./board-helper";
 import { Volatility } from "./volatility";
+import boardDefinition from "./board-definition";
 
 export interface MultiplierConfig {
     min: number;
@@ -11,11 +12,15 @@ export interface MultiplierConfig {
 export class MultiplierGenerator {
     private readonly chance: Chance.Chance;
     private readonly config: MultiplierConfig;
+    private readonly definition: any;
     private readonly multiplierWeights = {};
 
     constructor(config: MultiplierConfig, definition: any, volatility: Volatility, isFreeSpin: boolean) {
         this.config = config;
-        this.multiplierWeights = isFreeSpin ? definition[volatility].freeSpin.multiplierWeights : definition[volatility].normalSpin.multiplierWeights;
+        this.definition = definition ?? boardDefinition;
+        this.multiplierWeights = isFreeSpin
+            ? this.definition[volatility].freeSpin.multiplierWeights
+            : this.definition[volatility].normalSpin.multiplierWeights;
         this.chance = new Chance();
     }
 
