@@ -33,7 +33,7 @@ export class BoardGenerator {
 
     constructor(settings: BoardSettings, multiplierConfig: MultiplierConfig, definition: any = null, volatility: Volatility, isFreeSpin = false) {
         this.definition = definition ?? boardDefinition;
-        this.volatility = volatility && boardDefinition[volatility] ? volatility : Volatility.MediumLow;
+        this.volatility = volatility && this.definition[volatility] ? volatility : Volatility.MediumLow;
         this.settings = settings;
 
         this.multiplierGenerator = new MultiplierGenerator(multiplierConfig, definition, this.volatility, isFreeSpin);
